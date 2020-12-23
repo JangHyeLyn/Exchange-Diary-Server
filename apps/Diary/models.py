@@ -1,6 +1,6 @@
 from django.db import models
 
-from Accounts.models import User
+from apps.Accounts.models import User
 
 
 class Diary(models.Model):
