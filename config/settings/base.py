@@ -1,7 +1,11 @@
+import datetime
 import sys
+from datetime import timedelta
 
 from .secret import SECRET
 import os
+
+from .. import settings
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -9,7 +13,8 @@ SECRET_KEY = SECRET['SECRET_KEY']
 DEBUG = True
 
 ## add to apps directory path
-sys.path.insert(0, os.path.join(BASE_DIR, 'apps'))
+PARENT_DIR = os.path.abspath(os.path.join(BASE_DIR))
+sys.path.insert(0, os.path.join(PARENT_DIR, 'apps'))
 
 INSTALLED_APPS = [
     # Django
@@ -21,20 +26,22 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     ## Local app
-    'apps.Accounts',
-    'apps.Diary',
+    'Accounts',
+    # 'Diary',
+    'KakaoOauth',
 
     ## 3rd party
     'rest_framework',
     'rest_framework.authtoken',
+    'rest_auth',
 
     'django.contrib.sites',
     'allauth',
     'allauth.account',
     'rest_auth.registration',
-    'allauth.socialaccount',
 
     # provider
+    'allauth.socialaccount',
     'allauth.socialaccount.providers.kakao',
 ]
 
@@ -51,7 +58,6 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'config.urls'
 
-print(f'###### {BASE_DIR} ######')
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -108,17 +114,33 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-# REST_FRAMEWORK
+# Rest Framework
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
     ),
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.SessionAuthentication',
+
+    'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
-    ],
+    )
 }
 
-## auth PROVIDERS
+# rest-auth/kakao 호출시 response되는 user 정보 custom serializer
+REST_AUTH_SERIALIZERS = {
+    'USER_DETAILS_SERIALIZER': 'KakaoOauth.serializers.KakaoUserSerializer',
+}
+
+REST_USE_JWT = True
+
+AUTH_USER_MODEL = 'Accounts.User'
+
+# all-auth model custom
+# ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+ACCOUNT_EMAIL_REQUIRED = True
+# ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+
+
+## auth PROVIDERS and ADAPTER
 SOCIALACCOUNT_PROVIDERS = SECRET['SOCIALACCOUNT_PROVIDERS']
-print(SECRET['SOCIALACCOUNT_PROVIDERS'])
+SOCIALACCOUNT_ADAPTER = 'KakaoOauth.adapter.SocialAccountRegisterAdapter'
