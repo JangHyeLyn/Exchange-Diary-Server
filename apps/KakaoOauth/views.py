@@ -2,7 +2,10 @@ from config.settings.secret import SECRET
 from django.shortcuts import redirect, render
 import requests
 import json
-import urllib
+
+from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
+from allauth.socialaccount.providers.kakao.views import KakaoOAuth2Adapter
+from rest_auth.registration.views import SocialLoginView
 
 
 # code 요청
@@ -37,3 +40,7 @@ def kakao_callback(request):
     return render(request, 'index.html', {
         'access_token': access_token
     })
+
+class KakaoLogin(SocialLoginView):
+    adapter_class = KakaoOAuth2Adapter
+
