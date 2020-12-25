@@ -9,4 +9,4 @@ urlpatterns = [
 
     # All-Auth
     path('rest-auth/kakao/', KakaoLogin.as_view(), name='kakao_login'),
-]
+    ]

@@ -1,23 +1,22 @@
 from django.db import models
 
-#from apps.Accounts.models import User
+from django.contrib.auth import get_user_model
 
+class Diary(models.Model):
+    class MaxPageChoices(models.IntegerChoices):
+        LOW, NORMAL, HIGH = 20, 30, 50
 
-#class Diary(models.Model):
-#    class MaxPageChoices(models.IntegerChoices):
-#        LOW, NORMAL, HIGH = 20, 30, 50
+    id = models.AutoField(primary_key=True)
+    title = models.CharField(max_length=30)
+    now_page = models.IntegerField(default=1)
+    total_page = models.IntegerField(default=MaxPageChoices.LOW, choices=MaxPageChoices.choices)
+    now_writer = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='now_writer')
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
-#    id = models.AutoField(primary_key=True)
-#    title = models.CharField(max_length=30)
-#    now_page = models.IntegerField(default=1)
-#    total_page = models.IntegerField(default=MaxPageChoices.LOW, choices=MaxPageChoices.choices)
-#    now_writer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='now_writer')
-#    user = models.ForeignKey(User, on_delete=models.CASCADE)
-#    created_at = models.DateTimeField(auto_now_add=True)
-#    updated_at = models.DateTimeField(auto_now=True)
-
-#    def __str__(self):
-#        return self.title
+    def __str__(self):
+        return self.title
 
 
 #class DiaryContent(models.Model):

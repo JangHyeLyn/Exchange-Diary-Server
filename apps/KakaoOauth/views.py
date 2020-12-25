@@ -3,7 +3,6 @@ from django.shortcuts import redirect, render
 import requests
 import json
 
-from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
 from allauth.socialaccount.providers.kakao.views import KakaoOAuth2Adapter
 from rest_auth.registration.views import SocialLoginView
 
@@ -41,6 +40,7 @@ def kakao_callback(request):
         'access_token': access_token
     })
 
+#from rest_framework_jwt.
 class KakaoLogin(SocialLoginView):
     adapter_class = KakaoOAuth2Adapter
 
