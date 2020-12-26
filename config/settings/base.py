@@ -27,7 +27,7 @@ INSTALLED_APPS = [
 
     ## Local app
     'Accounts',
-    # 'Diary',
+    'Diary',
     'KakaoOauth',
 
     ## 3rd party
@@ -130,6 +130,16 @@ REST_AUTH_SERIALIZERS = {
     'USER_DETAILS_SERIALIZER': 'KakaoOauth.serializers.KakaoUserSerializer',
 }
 
+
+# djangorestframework-jwt
+JWT_AUTH = {
+    'JWT_SECRET_KEY': SECRET['SECRET_KEY'],
+    'JWt_ALGORITHM': 'HS256',
+    'JWT_ALLOW_REFRESH': True,
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(days=7),
+    'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=28)
+}
+
 REST_USE_JWT = True
 
 AUTH_USER_MODEL = 'Accounts.User'
@@ -139,7 +149,6 @@ AUTH_USER_MODEL = 'Accounts.User'
 ACCOUNT_EMAIL_REQUIRED = True
 # ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
-
 
 ## auth PROVIDERS and ADAPTER
 SOCIALACCOUNT_PROVIDERS = SECRET['SOCIALACCOUNT_PROVIDERS']

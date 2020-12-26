@@ -4,10 +4,13 @@ from django.contrib import admin
 from django.urls import path, include
 
 urlpatterns = [
+    # admin
     path('admin/', admin.site.urls),
 
-    #    path('api/v1/', include('Accounts.urls')),
-    #    path('api/v1/',include('Diary.urls')),
+    # Local Apps
+    path('api/v1/', include('Accounts.urls')),
+    path('api/v1/', include('Diary.urls')),
+
     path('account/', include('rest_auth.urls')),
     path('account/registration/', include('rest_auth.registration.urls')),
     path('account/', include('allauth.urls')),
