@@ -2,7 +2,7 @@ from rest_framework.serializers import ModelSerializer, HyperlinkedModelSerializ
 from ..models import Diary
 
 
-class UserDiarySetSZ(HyperlinkedModelSerializer):
+class DiaryListSZ(HyperlinkedModelSerializer):
     class Meta:
         model = Diary
-        fields = ['url', 'id', 'title']
+        fields = ['url', 'id', 'title', 'now_page', 'total_page', 'created_at', 'updated_at']
