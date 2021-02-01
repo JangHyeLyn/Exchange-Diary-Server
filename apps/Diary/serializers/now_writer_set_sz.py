@@ -2,7 +2,7 @@ from rest_framework.serializers import ModelSerializer, HyperlinkedModelSerializ
 from ..models import Diary
 
 
-class NowWriterSZ(HyperlinkedModelSerializer):
+class NowWriterSZ(ModelSerializer):
     class Meta:
         model = Diary
-        fields = ['url', 'id', 'title']
+        fields = ['id', 'title']
