@@ -4,10 +4,15 @@ from Diary.serializers.user_diary_set_sz import UserDiarySetSZ
 from Diary.serializers.now_writer_set_sz import NowWriterSZ
 
 
-class UserSerializer(HyperlinkedModelSerializer):
+class UserSZ(ModelSerializer):
     diary_set = UserDiarySetSZ(many=True, read_only=True)
     now_writer_set = NowWriterSZ(many=True, read_only=True)
 
     class Meta:
         model = get_user_model()
-        fields = ['url', 'id', 'username', 'email', 'diary_set', 'now_writer_set']
+        fields = ['id', 'username', 'email','description','kakao_img', 'diary_set', 'now_writer_set']
+
+class UserDiarySZ(ModelSerializer):
+    class Meta:
+        model = get_user_model()
+        fields = ['id', 'username', 'email']
