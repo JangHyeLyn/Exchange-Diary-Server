@@ -5,8 +5,6 @@ from ..models import Diary
 
 
 class DiaryListSZ(ModelSerializer):
-    user = UserDiarySZ(many=True, read_only=True)
-
     class Meta:
         model = Diary
         fields = ['id', 'title', 'now_page', 'total_page', 'created_at', 'updated_at']

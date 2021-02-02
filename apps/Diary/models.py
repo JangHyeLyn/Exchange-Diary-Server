@@ -45,7 +45,7 @@ class DiaryGroupMember(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.diary
+        return str(self.rank)
 
     class Meta:
         ordering = ['rank']
