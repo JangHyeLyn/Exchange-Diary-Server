@@ -5,7 +5,6 @@ from datetime import timedelta
 from .secret import SECRET
 import os
 
-
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 SECRET_KEY = SECRET['SECRET_KEY']
@@ -115,20 +114,18 @@ STATIC_URL = '/static/'
 
 # Rest Framework
 REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
-    ),
-
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
-    )
+    ),
+
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10,
 }
 
 # rest-auth/kakao 호출시 response되는 user 정보 custom serializer
 REST_AUTH_SERIALIZERS = {
     'USER_DETAILS_SERIALIZER': 'KakaoOauth.serializers.KakaoUserSerializer',
 }
-
 
 # djangorestframework-jwt
 JWT_AUTH = {

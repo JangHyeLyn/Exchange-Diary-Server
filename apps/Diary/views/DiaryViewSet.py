@@ -1,37 +1,55 @@
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
 from rest_framework.viewsets import ModelViewSet
-from ..models import Diary
+from rest_framework.decorators import action
+from rest_framework import status
+from ..models import Diary, DiaryMember
+from ..permissions import IsSelf
 from rest_framework.response import Response
-from ..serializers.diary_list_sz import DiaryListSZ, DiaryDetailSZ
-from django.db import transaction
+from ..serializers.diary_sz import DiarySZ, DiaryDetailSZ
+from ..serializers.diary_member_sz import DiaryMemberSZ
 from rest_framework import status
 
 
 class DiaryViewSet(ModelViewSet):
     queryset = Diary.objects.all()
-    serializer_class = DiaryListSZ
-    permission_classes = [IsAuthenticated]
+    serializer_class = DiarySZ
 
-    def retrieve(self, request, *args, **kwargs):
-        serializer = DiaryDetailSZ(self.get_object())
-        return Response(data=serializer.data)
+    def get_permissions(self):
+        if self.action == "list":
+            permission_classes = [AllowAny]
+        else:
+            permission_classes = [AllowAny]
+        return [permission() for permission in permission_classes]
 
-    def create(self, request, *args, **kwargs):
-        print('DiaryViewSet create 진입')
-
-        with transaction.atomic():
-            diary = Diary(
-                title=request.data['title'],
-            )
-            if 'total_page' in request.data:
-                diary.total_page = request.data['total_page']
-
-            diary.save()
-
-            request.user.diary_set.add(diary)
-            request.user.now_writer_set.add(diary)
-
-            serializer = self.get_serializer(diary)
+    def retrieve(self, request, pk=None):
+        try:
+            diary = self.get_object()
+            serializer = DiaryDetailSZ(diary)
             return Response(data=serializer.data)
+        except Exception:
+            return Response(data=serializer.errors, status=status.HTTP_404_NOT_FOUND)
 
-        return Response(data=status.HTTP_400_BAD_REQUEST)
+    @action(methods=['post'], detail=True)
+    def join(self, request, pk):
+        try:
+            member = DiaryMember.objects.create(
+                nickname=request.data.get('nickname', request.user.username),
+                diary=Diary.objects.get(pk=pk),
+                user=request.user
+            )
+        except ValueError:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        return Response(data=DiaryMemberSZ(member).data)
+
+    @join.mapping.delete
+    def delete_join(self, request, pk):
+        pass
+
+    @action(methods=['get'], detail=False)
+    def my(self, request):
+        my_diaries = []
+        for member in DiaryMember.objects.filter(user=request.user):
+            my_diaries.append(Diary.objects.get(pk=member.diary_id))
+
+        serializer = DiarySZ(my_diaries, many=True)
+        return Response(data=serializer.data)
