@@ -15,5 +15,3 @@ class UserViewSet(ModelViewSet):
             Q(email=self.request.user.email)
         )
         return qs
-#class UserDetailViewSet(ModelViewSet):
-#    queryset = User.objects

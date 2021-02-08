@@ -5,7 +5,6 @@ from datetime import timedelta
 from .secret import SECRET
 import os
 
-from .. import settings
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
