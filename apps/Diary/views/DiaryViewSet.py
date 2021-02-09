@@ -34,4 +34,9 @@ class DiaryViewSet(ModelViewSet):
             serializer = self.get_serializer(diary)
             return Response(data=serializer.data)
 
+    @members.mapping.delete
+    def delete_member(self, request, pk):
+        """
+        TODO::delete 작업 해야됨
+        """
         return Response(data=status.HTTP_400_BAD_REQUEST)
