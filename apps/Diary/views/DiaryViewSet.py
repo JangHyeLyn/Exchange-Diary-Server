@@ -67,4 +67,7 @@ class DiaryViewSet(ModelViewSet):
 
     @members.mapping.delete
     def delete_member(self, request, pk):
+        """
+        TODO::delete 작업 해야됨
+        """
         return Response(data=None)
