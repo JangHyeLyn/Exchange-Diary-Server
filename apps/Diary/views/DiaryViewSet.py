@@ -67,4 +67,7 @@ class DiaryViewSet(ModelViewSet):
 
     @members.mapping.delete
     def delete_member(self, request, pk):
-        return Response(data=None)
+        """
+        TODO::delete 작업 해야됨
+        """
+        return Response(data=status.HTTP_400_BAD_REQUEST)

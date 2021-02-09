@@ -6,4 +6,3 @@ class SocialAccountRegisterAdapter(DefaultSocialAccountAdapter):
         user = sociallogin.user
         sociallogin.save(request)
         return user
-

@@ -32,5 +32,5 @@ class DiaryGroupMemberViewSet(ModelViewSet):
             serializer = self.get_serializer(diary_group_member)
             return Response(data=serializer.data)
 
-        return Response(data=status.HTTP_400_BAD_REQUEST)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
