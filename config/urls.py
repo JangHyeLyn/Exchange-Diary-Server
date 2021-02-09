@@ -2,14 +2,13 @@ from allauth.account.views import confirm_email
 from django.conf.urls import url
 from django.contrib import admin
 from django.urls import path, include
-from django.conf.urls.static import static
-from django.conf import settings
+
 urlpatterns = [
     # admin
     path('admin/', admin.site.urls),
 
     # Local Apps
-    path('api/v1/', include(('Accounts.urls'))),
+    path('api/v1/', include('Accounts.urls')),
     path('api/v1/', include('Diary.urls')),
 
     path('account/', include('rest_auth.urls')),
@@ -23,6 +22,3 @@ urlpatterns = [
     path('rest-auth/', include('rest_auth.urls')),
 
 ]
-
-urlpatterns += \
-    static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
