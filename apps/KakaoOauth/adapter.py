@@ -6,9 +6,3 @@ class SocialAccountRegisterAdapter(DefaultSocialAccountAdapter):
         user = sociallogin.user
         sociallogin.save(request)
         return user
-
-    #def populate_user(self, request, sociallogin, data):
-    #    print(data)
-    #    user = sociallogin.user
-    #    return user
-
