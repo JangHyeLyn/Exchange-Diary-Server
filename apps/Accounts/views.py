@@ -1,7 +1,7 @@
 from .models import User
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.decorators import action, api_view
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
 from .permissions import IsSelf
@@ -25,6 +25,12 @@ class UserViewSet(ModelViewSet):
         else:
             permission_classes = [IsSelf]
         return [permission() for permission in permission_classes]
+
+    @action(detail=False, methods=['get'])
+    def me(self, request):
+        me = request.user
+        serializer = UserSZ(me)
+        return Response(data=serializer.data)
 
     @action(detail=True)
     def group(self, request, pk):

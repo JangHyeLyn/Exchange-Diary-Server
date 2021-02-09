@@ -29,22 +29,6 @@ class DiaryViewSet(ModelViewSet):
         except Exception:
             return Response(data=serializer.errors, status=status.HTTP_404_NOT_FOUND)
 
-    @action(methods=['post'], detail=True)
-    def join(self, request, pk):
-        try:
-            member = DiaryMember.objects.create(
-                nickname=request.data.get('nickname', request.user.username),
-                diary=Diary.objects.get(pk=pk),
-                user=request.user
-            )
-        except ValueError:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-        return Response(data=DiaryMemberSZ(member).data)
-
-    @join.mapping.delete
-    def delete_join(self, request, pk):
-        pass
-
     @action(methods=['get'], detail=False)
     def my(self, request):
         my_diaries = []
@@ -53,3 +37,34 @@ class DiaryViewSet(ModelViewSet):
 
         serializer = DiarySZ(my_diaries, many=True)
         return Response(data=serializer.data)
+
+    @action(methods=['get'], detail=True)
+    def members(self, request, pk):
+        try:
+            members = DiaryMember.objects.filter(diary=pk)
+            serializer = DiaryMemberSZ(members, many=True)
+            return Response(data=serializer.data)
+        except DiaryMember.DoesNotExist:
+            return Response(data=status.HTTP_400_BAD_REQUEST, status=status.HTTP_400_BAD_REQUEST)
+
+    @members.mapping.post
+    def create_member(self, request, pk):
+        try:
+            diary = Diary.objects.get(pk=pk)
+            if DiaryMember.objects.get(diary=diary, user=request.user):
+                return Response(status=status.HTTP_226_IM_USED, data=["이미 멤버에 가입되어 있습니다"])
+
+        except DiaryMember.DoesNotExist:
+            new_member = DiaryMember.objects.create(
+                nickname=request.data.get('nickname', request.user.username),
+                diary=diary,
+                user=request.user,
+            )
+            serializer = DiaryMemberSZ(new_member)
+            return Response(data=serializer.data)
+        except Exception as ex:
+            return Response(data=ex, status=status.HTTP_401_UNAUTHORIZED)
+
+    @members.mapping.delete
+    def delete_member(self, request, pk):
+        return Response(data=None)

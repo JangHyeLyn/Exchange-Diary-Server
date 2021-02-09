@@ -8,7 +8,7 @@ class DiarySZ(ModelSerializer):
     class Meta:
         model = Diary
         fields = ['id', 'title', 'now_page', 'total_page', 'master', 'now_writer', 'created_at', 'updated_at']
-        read_only_fields = ("id", "now_page", "created_at", "updated_at")
+        read_only_fields = ("id", "now_page", "master", "now_writer", "created_at", "updated_at")
 
     def create(self, validated_data):
         user = self.context.get("request").user
