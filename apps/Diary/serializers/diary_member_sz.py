@@ -5,6 +5,6 @@ from ..models import Diary, DiaryMember
 class DiaryMemberSZ(ModelSerializer):
     class Meta:
         model = DiaryMember
-        fields = ['id', 'nickname', 'diary', 'created_at', 'updated_at']
+        fields = ['id', 'nickname']
 
 
