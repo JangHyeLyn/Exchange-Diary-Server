@@ -38,13 +38,13 @@ class UserViewSet(ModelViewSet):
 
     @action(detail=False, methods=['get'])
     def hyelyn(self, request):
-        hyelyn = User.objects.get(pk=3)
+        hyelyn = User.objects.get(email="nfzoze01@gmail.com")
         serializer = UserSZ(hyelyn)
         return Response(data=serializer.data)
 
     @hyelyn.mapping.patch
     def put_hyelyn(self, request):
-        hyelyn = User.objects.get(pk=3)
+        hyelyn = User.objects.get(email="nfzoze01@gmail.com")
         serializer = UserSZ(hyelyn, request.data, partial=True)
 
         if serializer.is_valid():
