@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'rest_auth.registration',
 
+    'storages',
     # provider
     'allauth.socialaccount',
     'allauth.socialaccount.providers.kakao',
@@ -152,3 +153,8 @@ ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ## auth PROVIDERS and ADAPTER
 SOCIALACCOUNT_PROVIDERS = SECRET['SOCIALACCOUNT_PROVIDERS']
 SOCIALACCOUNT_ADAPTER = 'KakaoOauth.adapter.SocialAccountRegisterAdapter'
+
+
+
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'path/to/store/my/files/')
