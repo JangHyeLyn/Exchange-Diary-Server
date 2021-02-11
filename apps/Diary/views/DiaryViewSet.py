@@ -35,6 +35,8 @@ class DiaryViewSet(ModelViewSet):
         for member in DiaryMember.objects.filter(user=request.user):
             my_diaries.append(Diary.objects.get(pk=member.diary_id))
 
+        print(DiaryMember.objects.select_related('diary').filter(user=request.user))
+
         serializer = DiarySZ(my_diaries, many=True)
         return Response(data=serializer.data)
 
