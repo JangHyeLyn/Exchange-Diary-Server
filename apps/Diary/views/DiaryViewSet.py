@@ -2,11 +2,14 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import action
 from rest_framework import status
-from ..models import Diary, DiaryMember
+from ..models import Diary, DiaryMember, DiaryGroup, DiaryGroupMember
 from ..permissions import IsSelf
 from rest_framework.response import Response
 from ..serializers.diary_sz import DiarySZ, DiaryDetailSZ
 from ..serializers.diary_member_sz import DiaryMemberSZ
+from ..serializers.diary_group_sz import DiaryGroupSZ
+from Accounts.serializers.user_sz import UserSZ
+from Accounts.models import User
 from rest_framework import status
 
 
@@ -73,3 +76,41 @@ class DiaryViewSet(ModelViewSet):
         TODO::delete 작업 해야됨
         """
         return Response(data=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=True, methods=['get'])
+    def group(self, request, pk):
+        print(request.user)
+        my_group = DiaryGroup.objects.filter(user=request.user)
+
+        group_serializer = DiaryGroupSZ(my_group, many=True)
+        print(my_group)
+
+        return Response(data=group_serializer.data)
+        if not self.get_object().group:
+            group = self.get_object().group
+            print(group)
+            return Response(data=str(group))
+        else:
+            return Response(data={'group': 0})
+
+    @group.mapping.post
+    def create_group(self, request, pk):
+        return Response(data=None)
+
+
+    @action(detail=False, methods=['get'])
+    def hyelyn(self, request):
+        hyelyn = User.objects.get(email="nfzoze01@gmail.com")
+        serializer = UserSZ(hyelyn)
+        return Response(data=serializer.data)
+
+    @hyelyn.mapping.patch
+    def put_hyelyn(self, request):
+        hyelyn = User.objects.get(email="nfzoze01@gmail.com")
+        serializer = UserSZ(hyelyn, request.data, partial=True)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(data=serializer.data)
+        else:
+            return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)

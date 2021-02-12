@@ -1,11 +1,11 @@
-from .models import User
+from ..models import User
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
-from .permissions import IsSelf
-from .serializers import UserSZ
+from ..permissions import IsSelf
+from ..serializers.user_sz import UserSZ
 from django.contrib.auth import get_user_model
 
 
@@ -31,10 +31,6 @@ class UserViewSet(ModelViewSet):
         me = request.user
         serializer = UserSZ(me)
         return Response(data=serializer.data)
-
-    @action(detail=True)
-    def group(self, request, pk):
-        return Response(data="123123123")
 
     @action(detail=False, methods=['get'])
     def hyelyn(self, request):

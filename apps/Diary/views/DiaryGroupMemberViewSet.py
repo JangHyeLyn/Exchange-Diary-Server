@@ -2,13 +2,13 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
 from ..models import Diary, DiaryGroup, DiaryGroupMember
 from rest_framework.response import Response
-from ..serializers.diary_group_member_sz import DiaryGroupMemberListSZ
+from ..serializers.diary_group_member_sz import DiaryGroupMemberSZ
 from django.db import transaction
 from rest_framework import status
 
 class DiaryGroupMemberViewSet(ModelViewSet):
     queryset = DiaryGroupMember.objects.all()
-    serializer_class = DiaryGroupMemberListSZ
+    serializer_class = DiaryGroupMemberSZ
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
