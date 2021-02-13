@@ -48,7 +48,7 @@ class DiaryGroupMember(BaseModel):
     diary = models.ForeignKey(Diary, on_delete=models.CASCADE,related_name='group', blank=True, null=True)
 
     def __str__(self):
-        return str(self.rank)
+        return self.diary.title
 
     class Meta:
         ordering = ['rank']

@@ -57,7 +57,7 @@ class DiaryViewSet(ModelViewSet):
         try:
             diary = Diary.objects.get(pk=pk)
             if DiaryMember.objects.get(diary=diary, user=request.user):
-                return Response(status=status.HTTP_226_IM_USED, data=["이미 멤버에 가입되어 있습니다"])
+                return Response(data=["이미 멤버에 가입되어 있습니다"])
 
         except DiaryMember.DoesNotExist:
             new_member = DiaryMember.objects.create(
@@ -86,23 +86,26 @@ class DiaryViewSet(ModelViewSet):
 
         is_member = DiaryGroupMember.objects.filter(diary=pk)
 
+        content = {
+            'group': group_serializer.data,
+        }
+
         # 다이어리가 그룹안에 포함되어 있을때
         if is_member:
-            print("hihi")
+            content['is_group'] = int(pk)
+
 
         # 다이어가 그룹안에 포함되어 있지 않을 때
         else:
-            content = {
-                'message': {
-                    'group': group_serializer.data,
-                    'is_group': 0
-                },
-            }
+            content['is_group'] = 0
 
         return Response(data=content)
 
     @group.mapping.post
-    def create_group(self, request, pk):
+    def add_group_member(self, request, pk):
+        group = DiaryGroup.objects.get(user=request.user, pk=request.data.get('group'))
+
+        print(group)
         return Response(data=None)
 
     @action(detail=False, methods=['get'])
