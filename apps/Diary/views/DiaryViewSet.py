@@ -83,20 +83,27 @@ class DiaryViewSet(ModelViewSet):
         my_group = DiaryGroup.objects.filter(user=request.user)
 
         group_serializer = DiaryGroupSZ(my_group, many=True)
-        print(my_group)
 
-        return Response(data=group_serializer.data)
-        if not self.get_object().group:
-            group = self.get_object().group
-            print(group)
-            return Response(data=str(group))
+        is_member = DiaryGroupMember.objects.filter(diary=pk)
+
+        # 다이어리가 그룹안에 포함되어 있을때
+        if is_member:
+            print("hihi")
+
+        # 다이어가 그룹안에 포함되어 있지 않을 때
         else:
-            return Response(data={'group': 0})
+            content = {
+                'message': {
+                    'group': group_serializer.data,
+                    'is_group': 0
+                },
+            }
+
+        return Response(data=content)
 
     @group.mapping.post
     def create_group(self, request, pk):
         return Response(data=None)
-
 
     @action(detail=False, methods=['get'])
     def hyelyn(self, request):

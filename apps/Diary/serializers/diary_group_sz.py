@@ -12,3 +12,4 @@ class DiaryGroupSZ(ModelSerializer):
         user = self.context.get('request').user
         group = DiaryGroup.objects.create(**validated_data, user=user)
         return group
+
