@@ -6,3 +6,7 @@ class DiaryGroupMemberSZ(ModelSerializer):
     class Meta:
         model = DiaryGroupMember
         fields = ['id', 'rank', 'group', 'diary', 'created_at', 'updated_at']
+
+    def create(self, validated_data):
+        member = DiaryGroupMember.objects.create(**validated_data)
+        return member
