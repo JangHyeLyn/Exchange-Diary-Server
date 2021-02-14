@@ -1,5 +1,5 @@
 from rest_framework.serializers import ModelSerializer, HyperlinkedModelSerializer
-from Accounts.serializers import UserDiarySZ
+from Accounts.serializers.user_diary_sz import UserDiarySZ
 from .diary_member_sz import DiaryMemberSZ
 from ..models import Diary
 

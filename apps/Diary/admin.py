@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Diary, DiaryGroup, DiaryMember  # , DiaryContent
+from .models import Diary, DiaryMember, DiaryGroup, DiaryGroupMember   # , DiaryContent
 
 
 @admin.register(Diary)
@@ -12,6 +12,9 @@ class DiaryAdmin(admin.ModelAdmin):
 class DiaryGroupAdmin(admin.ModelAdmin):
     list_display = ['title', 'user']
 
+@admin.register(DiaryGroupMember)
+class DiaryGroupMember(admin.ModelAdmin):
+    pass
 
 # @admin.register(DiaryContent)
 # class DiaryContentAdmin(admin.ModelAdmin):

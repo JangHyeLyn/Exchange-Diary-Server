@@ -8,3 +8,6 @@ class DiaryMemberSZ(ModelSerializer):
         fields = ['id', 'nickname', 'diary', 'created_at', 'updated_at']
 
 
+    def create(self, validated_data):
+        new_member = DiaryMember.objects.create(**validated_data, user=self.context.user)
+        return new_member
