@@ -10,4 +10,4 @@ class UserSZ(ModelSerializer):
 
     class Meta:
         model = get_user_model()
-        fields = ['id', 'username', 'email','description','kakao_img', 'diary_set', 'now_writer_set']
+        fields = ['id', 'username', 'email','description','kakao_img', 'profile_img', 'diary_set', 'now_writer_set']

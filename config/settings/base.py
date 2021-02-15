@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'rest_auth.registration',
 
     'storages',
+    'drf_yasg',
+
     # provider
     'allauth.socialaccount',
     'allauth.socialaccount.providers.kakao',
@@ -127,6 +129,7 @@ REST_FRAMEWORK = {
 
     'DEFAULT_RENDERER_CLASSES': [
         'config.renderers.CustomRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
     ]
 }
 
@@ -162,3 +165,21 @@ SOCIALACCOUNT_ADAPTER = 'KakaoOauth.adapter.SocialAccountRegisterAdapter'
 
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'path/to/store/my/files/')
+
+SWAGGER_SETTINGS = {
+    'DEFAULT_AUTO_SCHEMA_CLASS': 'config.inspectors.MyAutoSchema',
+    'SECURITY_DEFINITIONS': {
+        'JWT Token': {
+            'type': 'apiKey',
+            'description': '''
+                인증을 위한 jwt 토큰\n
+                모든 http 통신에서 필요하고 Header에 담아서 보내주어야 한다.\n
+                형식은 아래와 같다.\n
+                key : Authorization,\n 
+                value : jwt eyJ0eXAiOiJKV1.....0qR01ScLtrdU\n                
+            ''',
+            'name': 'Authorization',
+            'in': 'header'
+        }
+    }
+}

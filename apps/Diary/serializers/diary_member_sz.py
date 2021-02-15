@@ -6,6 +6,7 @@ class DiaryMemberSZ(ModelSerializer):
     class Meta:
         model = DiaryMember
         fields = ['id', 'nickname', 'diary', 'created_at', 'updated_at']
+        read_only_fields = ('id','diary','created_at','updated_at')
 
 
     def create(self, validated_data):

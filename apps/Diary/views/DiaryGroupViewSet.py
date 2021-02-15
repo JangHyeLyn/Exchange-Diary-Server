@@ -12,6 +12,7 @@ from rest_framework import status
 class DiaryGroupViewSet(ModelViewSet):
     queryset = DiaryGroup.objects.all()
     serializer_class = DiaryGroupSZ
+    tags = ["Group"]
 
     def get_queryset(self):
         return DiaryGroup.objects.filter(user=self.request.user)
