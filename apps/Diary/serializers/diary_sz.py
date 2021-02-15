@@ -9,6 +9,10 @@ class DiarySZ(ModelSerializer):
         model = Diary
         fields = ['id', 'title', 'now_page', 'total_page', 'master', 'now_writer', 'created_at', 'updated_at']
         read_only_fields = ("id", "now_page", "master", "now_writer", "created_at", "updated_at")
+        examples = {
+            'title':'테스트 다이어리',
+            'total_page': 30,
+        }
 
     def create(self, validated_data):
         user = self.context.get("request").user

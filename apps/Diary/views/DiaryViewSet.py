@@ -1,7 +1,9 @@
+from django.views import View
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import action
-from rest_framework import status
+from rest_framework import status, viewsets, mixins
 from ..models import Diary, DiaryMember, DiaryGroup, DiaryGroupMember
 from ..permissions import IsSelf
 from rest_framework.response import Response
@@ -9,21 +11,38 @@ from ..serializers.diary_sz import DiarySZ, DiaryDetailSZ
 from ..serializers.diary_member_sz import DiaryMemberSZ
 from ..serializers.diary_group_sz import DiaryGroupSZ
 from ..serializers.diary_group_member_sz import DiaryGroupMemberSZ
+from ..serializers.diary_group_id_sz import DiaryGroupIdSZ
 from rest_framework import status
 
 
-class DiaryViewSet(ModelViewSet):
+class DiaryViewSet(viewsets.GenericViewSet,
+                   mixins.ListModelMixin,
+                   mixins.CreateModelMixin,
+                   View):
+    '''
+    다이어리 관련
+
+    다이어리 관련
+    '''
     queryset = Diary.objects.all()
     serializer_class = DiarySZ
+    tags = ["Diary"]
 
     def get_permissions(self):
         if self.action == "list":
             permission_classes = [AllowAny]
+        elif self.action == "delete":
+            permission_classes = [IsAdminUser]
         else:
             permission_classes = [AllowAny]
         return [permission() for permission in permission_classes]
 
     def retrieve(self, request, pk=None):
+        '''
+        다이어리 상세 정보 조회
+
+        다이어리의 상세 정보를 조회
+        '''
         try:
             diary = self.get_object()
             serializer = DiaryDetailSZ(diary)
@@ -33,6 +52,11 @@ class DiaryViewSet(ModelViewSet):
 
     @action(methods=['get'], detail=False)
     def my(self, request):
+        '''
+        내가 가입한 다이어리 확인
+
+        내가 가입한 다이어리 확인 pk없이 jwt만 있으면 확인 가능
+        '''
         my_diaries = []
         for member in DiaryMember.objects.filter(user=request.user):
             my_diaries.append(Diary.objects.get(pk=member.diary_id))
@@ -40,8 +64,16 @@ class DiaryViewSet(ModelViewSet):
         serializer = DiarySZ(my_diaries, many=True)
         return Response(data=serializer.data)
 
+    @swagger_auto_schema(
+        responses={200: DiaryMemberSZ(many=True)}
+    )
     @action(methods=['get'], detail=True)
     def members(self, request, pk):
+        '''
+        현재 다이어리에 속해있는 유저 정보 확인
+
+        현재 다이어리에 누가 있는지 확인
+        '''
         try:
             members = DiaryMember.objects.filter(diary=pk)
             serializer = DiaryMemberSZ(members, many=True)
@@ -50,7 +82,20 @@ class DiaryViewSet(ModelViewSet):
             return Response(data=status.HTTP_400_BAD_REQUEST, status=status.HTTP_400_BAD_REQUEST)
 
     @members.mapping.post
+    @swagger_auto_schema(
+        request_body=DiaryMemberSZ,
+    )
     def create_member(self, request, pk):
+        '''
+        다이어리에 가입
+
+        다이어리에 새로 참여하게 되면 가입시 이름이 아닌 닉네임을 사용하기로\n
+        했기 때문에 다이어리에 가입하려면 닉네임을 작성해야 된다\n
+
+        현재 다이어리 생성 부터 가입 까지의 로직은 아래와 같다\n
+        다이어리를 생성한 사람은 다이어리를 생성함으로써 다이어리에 가입이 되는것이 아니다\n
+        닉네임을 동반하여 다이어리 멤버에 가입을 해야지만 최종적으로 다이어리에 가입이 되는것 이다.\n
+        '''
         try:
             diary = Diary.objects.get(pk=pk)
             if DiaryMember.objects.get(diary=diary, user=request.user):
@@ -74,15 +119,30 @@ class DiaryViewSet(ModelViewSet):
     @members.mapping.delete
     def delete_member(self, request, pk):
         """
+        다이어리 멤버 삭제
+
+        작업 예정
         TODO::delete 작업 해야됨
         """
         return Response(data=status.HTTP_400_BAD_REQUEST)
 
+    @swagger_auto_schema(
+        responses={200: DiaryGroupSZ(many=True)}
+    )
     @action(detail=True, methods=['get'])
     def group(self, request, pk):
+        '''
+        특정 다이어리에서 그룹 가입 여부 확인
+
+        다이어리안에서 사용자가 만든 그룹을 볼수 있고\n
+        현재 다이어리가 어느 그룹에 속해 있는지 확인\n
+        is_group가 True이면 그룹에 속해 있다는 것\n
+        is_group가 False이면 그룹에 속해 있지 않다는 것\n
+        모든 그룹에 대해 is_group가 False이면 미지정 그룹에 속해있는것
+        '''
         # pk는 diary의 pk이다.
         my_group = DiaryGroup.objects.filter(user=request.user)
-        group_serializer = DiaryGroupSZ(my_group, many=True)
+        group_serializer = DiaryGroupSZ(my_group, many=True, context={'request': request, 'diary_pk': pk})
         is_member = DiaryGroupMember.objects.filter(diary=pk)
         content = {
             'group': group_serializer.data,
@@ -96,10 +156,19 @@ class DiaryViewSet(ModelViewSet):
         else:
             content['is_group'] = 0
 
-        return Response(data=content)
+        return Response(data=group_serializer.data)
 
+    @swagger_auto_schema(
+        request_body=DiaryGroupIdSZ,
+        responses={200: DiaryGroupIdSZ}
+    )
     @group.mapping.post
     def add_group_member(self, request, pk):
+        '''
+        현재 다이어리의 그룹을 변경
+
+        현재 가입되어 있는 다이어리 그룹을 변경
+        '''
         member = DiaryGroupMember.objects.filter(diary=pk)
 
         # 그룹에 속해 있다면
@@ -121,4 +190,5 @@ class DiaryViewSet(ModelViewSet):
                 serializer.save()
                 return Response(data={'group': request.data.get('group')})
             else:
-                return Response(data=serializer.errors)
+                print("에러발생")
+                return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)

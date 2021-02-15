@@ -12,18 +12,20 @@ from django.contrib.auth import get_user_model
 class UserViewSet(ModelViewSet):
     queryset = get_user_model().objects.all()
     serializer_class = UserSZ
+    http_method_names = ['get','patch','put','delete']
+    tags = ["User"]
 
     def get_permissions(self):
         if self.action == "list":
-            permission_classes = [IsAdminUser]
+            permission_classes = [AllowAny]
         elif self.action == "create" or self.action == "retrieve":
             permission_classes = [AllowAny]
         elif self.action == "group":
-            permission_classes = [IsSelf]
+            permission_classes = [AllowAny]
         elif self.action == "hyelyn":
             permission_classes = [AllowAny]
         else:
-            permission_classes = [IsSelf]
+            permission_classes = [AllowAny]
         return [permission() for permission in permission_classes]
 
     @action(detail=False, methods=['get'])

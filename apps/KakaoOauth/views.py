@@ -17,6 +17,7 @@ def kakao_login(request):
 
 
 # access token 요청
+
 def kakao_callback(request):
     redirect_uri = "http://127.0.0.1:8000/account/login/kakao/callback"
     kakao_access_token_request_uri = "https://kauth.kakao.com/oauth/token"

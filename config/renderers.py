@@ -5,7 +5,7 @@ class CustomRenderer(JSONRenderer):
 
     def render(self, data=[], accepted_media_type=None, renderer_context=None):
         response_data = renderer_context.get('response')
-
+        print(response_data)
         response = {
             'code': response_data.status_code,
             'message': response_data.status_text,
