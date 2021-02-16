@@ -1,4 +1,5 @@
 from django.views import View
+from django.db.models import Q
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
 from rest_framework.viewsets import ModelViewSet
@@ -32,7 +33,7 @@ class DiaryViewSet(viewsets.GenericViewSet,
         if self.action == "list":
             permission_classes = [AllowAny]
         elif self.action == "delete":
-            permission_classes = [IsAdminUser]
+            permission_classes = [AllowAny]
         else:
             permission_classes = [AllowAny]
         return [permission() for permission in permission_classes]
@@ -57,9 +58,13 @@ class DiaryViewSet(viewsets.GenericViewSet,
 
         내가 가입한 다이어리 확인 pk없이 jwt만 있으면 확인 가능
         '''
-        my_diaries = []
-        for member in DiaryMember.objects.filter(user=request.user):
-            my_diaries.append(Diary.objects.get(pk=member.diary_id))
+
+        # 나의 다이어리 가지고오는 orm 수
+        # my_diaries = []
+        # for member in DiaryMember.objects.filter(user=2):
+        #     my_diaries.append(Diary.objects.get(pk=member.diary_id))
+
+        my_diaries = Diary.objects.filter(members__user=request.user)
 
         serializer = DiarySZ(my_diaries, many=True)
         return Response(data=serializer.data)
@@ -96,12 +101,10 @@ class DiaryViewSet(viewsets.GenericViewSet,
         다이어리를 생성한 사람은 다이어리를 생성함으로써 다이어리에 가입이 되는것이 아니다\n
         닉네임을 동반하여 다이어리 멤버에 가입을 해야지만 최종적으로 다이어리에 가입이 되는것 이다.\n
         '''
-        try:
-            diary = Diary.objects.get(pk=pk)
-            if DiaryMember.objects.get(diary=diary, user=request.user):
-                return Response(data=["이미 멤버에 가입되어 있습니다"])
 
-        except DiaryMember.DoesNotExist:
+        if Diary.objects.filter(members__diary=pk).filter(members__user=request.user):
+            return Response(data=["이미 멤버에 가입되어 있습니다"])
+        else:
             data = {
                 'nickname': request.data.get('nickname', request.user.username),
                 'diary': pk,
@@ -113,8 +116,6 @@ class DiaryViewSet(viewsets.GenericViewSet,
                 return Response(data=DiaryMemberSZ(new_member).data)
             else:
                 return Response(data=serializer.errors)
-        except Exception as ex:
-            return Response(data=ex, status=status.HTTP_401_UNAUTHORIZED)
 
     @members.mapping.delete
     def delete_member(self, request, pk):
@@ -143,18 +144,6 @@ class DiaryViewSet(viewsets.GenericViewSet,
         # pk는 diary의 pk이다.
         my_group = DiaryGroup.objects.filter(user=request.user)
         group_serializer = DiaryGroupSZ(my_group, many=True, context={'request': request, 'diary_pk': pk})
-        is_member = DiaryGroupMember.objects.filter(diary=pk)
-        content = {
-            'group': group_serializer.data,
-        }
-
-        # 다이어리가 그룹안에 포함되어 있을때
-        if is_member:
-            content['is_group'] = is_member.first().group.id
-
-        # 다이어가 그룹안에 포함되어 있지 않을 때
-        else:
-            content['is_group'] = 0
 
         return Response(data=group_serializer.data)
 

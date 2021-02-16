@@ -18,8 +18,7 @@ class DiaryGroupSZ(ModelSerializer):
 
     @swagger_serializer_method(serializer_or_field=BooleanField)
     def get_is_group(self, obj):
-        is_member = obj.members.all().filter(diary=self.context.get('diary_pk'))
-        if is_member:
+        if obj.members.all().filter(diary=self.context.get('diary_pk')):
             return True
         else:
             return False
