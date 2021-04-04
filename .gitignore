@@ -124,7 +124,10 @@ ENV/
 env.bak/
 venv.bak/
 pythonenv*
-config/settings/secret.py
+#config/settings/secret.py
+
+# static
+static/
 # Spyder project settings
 .spyderproject
 .spyproject
