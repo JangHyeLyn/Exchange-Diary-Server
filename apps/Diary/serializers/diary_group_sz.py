@@ -27,5 +27,5 @@ class DiaryGroupCreateSZ(ModelSerializer):
 
     class Meta:
         model = DiaryGroup
-        fields = ('id', 'title', 'created_at', 'updated_at')
-        read_only_fields = ('id')
+        fields = ('id', 'title', 'user', 'created_at', 'updated_at',)
+        read_only_fields = ('id', 'user')

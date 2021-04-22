@@ -31,7 +31,6 @@ class DiaryMember(BaseModel):
         return self.nickname
 
 class DiaryGroup(BaseModel):
-    id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=30)
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='user_diary_group_set')
     rank = models.IntegerField(default=1)

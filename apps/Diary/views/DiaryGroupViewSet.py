@@ -1,14 +1,16 @@
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
-from ..models import DiaryGroup
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework import generics
+from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
+
+from ..models import DiaryGroup
+
 from ..serializers.diary_group_sz import DiaryGroupSZ, DiaryGroupCreateSZ
 from ..serializers.diary_group_member_sz import DiaryGroupMemberSZ
 
 from django.db import transaction
-from rest_framework import status
-
 
 class DiaryGroupViewSet(ModelViewSet):
     queryset = DiaryGroup.objects.all()
@@ -24,9 +26,9 @@ class DiaryGroupViewSet(ModelViewSet):
         return Response(data=serializer.data)
 
     def create(self, request, *args, **kwargs):
-        serializer = DiaryGroupCreateSZ(data=request.data)
+        serializer = DiaryGroupCreateSZ(self.get_queryset(), data=request.data)
         serializer.is_valid(raise_exception=True)
-
+        serializer.save()
         return Response(data=serializer.data)
 
     @action(detail=True, methods=['get'], url_path='members')
@@ -45,3 +47,19 @@ class DiaryGroupViewSet(ModelViewSet):
     @member.mapping.delete
     def delete_member(self, request, pk):
         pass
+
+class ListCreateDiaryGroupView(generics.ListCreateAPIView):
+    queryset = DiaryGroup.objects.all()
+    serializer_class = DiaryGroupCreateSZ
+
+    def get_queryset(self):
+        return DiaryGroup.objects.filter(user=self.request.user)
+
+    # def list(self, request, *args, **kwargs):
+    #     serializer = self.get_serializer()
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(user=request.user, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+

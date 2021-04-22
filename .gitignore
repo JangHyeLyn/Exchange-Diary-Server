@@ -127,7 +127,7 @@ pythonenv*
 #config/settings/secret.py
 
 # static
-static/
+deploy_static/
 # Spyder project settings
 .spyderproject
 .spyproject
