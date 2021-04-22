@@ -41,6 +41,12 @@ class DiaryGroup(BaseModel):
     class Meta:
         ordering = ['rank']
 
+    @classmethod
+    def group_count(cls, pk):
+        group = DiaryGroup.objects.get(pk=pk)
+        group_member_count = group.members.all().count()
+        return group_member_count
+
 class DiaryGroupMember(BaseModel):
     rank = models.IntegerField()
     group = models.ForeignKey(DiaryGroup, on_delete=models.CASCADE,related_name='members',null=True, blank=True)

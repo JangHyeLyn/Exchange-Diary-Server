@@ -1,27 +1,22 @@
-from drf_yasg.utils import swagger_serializer_method
-from rest_framework.serializers import ModelSerializer, SerializerMethodField, BooleanField
-from ..models import DiaryGroup, DiaryGroupMember
+from rest_framework.serializers import ModelSerializer
+from rest_framework.serializers import SerializerMethodField
+
+from drf_writable_nested.serializers import WritableNestedModelSerializer
+
+from .diary_group_member_sz import DiaryGroupMemberSZ
+from ..models import DiaryGroup
+from ..models import DiaryGroupMember
 
 
-class DiaryGroupSZ(ModelSerializer):
-    is_group = SerializerMethodField()
-
+class DiaryGroupListSZ(ModelSerializer):
+    count = SerializerMethodField()
     class Meta:
         model = DiaryGroup
-        fields = ('id', 'title', 'rank', 'user', 'members', 'is_group', 'created_at', 'updated_at',)
-        read_only_fields = ('id', "user", "group_member_set",)
+        fields = ('id', 'title', 'user', 'count', 'created_at', 'updated_at',)
 
-    def create(self, validated_data):
-        user = self.context.get('request').user
-        group = DiaryGroup.objects.create(**validated_data, user=user)
-        return group
+    def get_count(self, obj):
+        return obj.group_count(obj.pk)
 
-    @swagger_serializer_method(serializer_or_field=BooleanField)
-    def get_is_group(self, obj):
-        if obj.members.all().filter(diary=self.context.get('diary_pk')):
-            return True
-        else:
-            return False
 
 class DiaryGroupCreateSZ(ModelSerializer):
 
@@ -29,3 +24,16 @@ class DiaryGroupCreateSZ(ModelSerializer):
         model = DiaryGroup
         fields = ('id', 'title', 'user', 'created_at', 'updated_at',)
         read_only_fields = ('id', 'user')
+
+
+    def create(self, validated_data):
+        user = self.context.get("request").user
+        diarygroup = DiaryGroup.objects.create(**validated_data, user=user)
+        return diarygroup
+
+class DiaryGroupRetriveSZ(WritableNestedModelSerializer):
+
+    diaries = DiaryGroupMemberSZ(many=True)
+    class Meta:
+        model =DiaryGroup
+        fields = ('id', 'title', 'user', 'diaries', 'created_at', 'updated_at', )

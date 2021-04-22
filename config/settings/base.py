@@ -122,8 +122,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'deploy_static')
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-APPEND_SLASH = True
-
 # Rest Framework
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (

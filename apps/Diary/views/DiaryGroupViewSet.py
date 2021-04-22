@@ -1,20 +1,26 @@
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework import generics
+from rest_framework.generics import ListCreateAPIView
+from rest_framework.generics import RetrieveAPIView
+from rest_framework.generics import RetrieveUpdateDestroyAPIView
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
+
 from ..models import DiaryGroup
 
-from ..serializers.diary_group_sz import DiaryGroupSZ, DiaryGroupCreateSZ
+from ..serializers.diary_group_sz import DiaryGroupListSZ
+from ..serializers.diary_group_sz import DiaryGroupCreateSZ
+
 from ..serializers.diary_group_member_sz import DiaryGroupMemberSZ
 
 from django.db import transaction
 
+
 class DiaryGroupViewSet(ModelViewSet):
     queryset = DiaryGroup.objects.all()
-    serializer_class = DiaryGroupSZ
+    serializer_class = DiaryGroupListSZ
     tags = ["Group"]
 
     def get_queryset(self):
@@ -48,18 +54,28 @@ class DiaryGroupViewSet(ModelViewSet):
     def delete_member(self, request, pk):
         pass
 
-class ListCreateDiaryGroupView(generics.ListCreateAPIView):
+
+class ListCreateDiaryGroupView(ListCreateAPIView):
     queryset = DiaryGroup.objects.all()
     serializer_class = DiaryGroupCreateSZ
+    permission_classes = (
+        IsAuthenticated,
+    )
 
     def get_queryset(self):
         return DiaryGroup.objects.filter(user=self.request.user)
 
-    # def list(self, request, *args, **kwargs):
-    #     serializer = self.get_serializer()
+    def list(self, request, *args, **kwargs):
+        serializer = DiaryGroupListSZ(self.get_queryset(), many=True)
+        return Response(serializer.data)
 
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(user=request.user, data=request.data)
+        serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
+        return Response(data=serializer.data, status=status.HTTP_201_CREATED,
+                        headers=self.get_success_headers(serializer.data))
 
+class RetrieveDiaryGroupView(RetrieveAPIView):
+    queryset = DiaryGroup.objects.all()
+    serializer_class = DiaryGroupListSZ

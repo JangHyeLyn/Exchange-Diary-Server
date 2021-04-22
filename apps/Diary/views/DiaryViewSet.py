@@ -10,7 +10,7 @@ from ..permissions import IsSelf
 from rest_framework.response import Response
 from ..serializers.diary_sz import DiarySZ, DiaryDetailSZ
 from ..serializers.diary_member_sz import DiaryMemberSZ
-from ..serializers.diary_group_sz import DiaryGroupSZ
+from ..serializers.diary_group_sz import DiaryGroupListSZ
 from ..serializers.diary_group_member_sz import DiaryGroupMemberSZ
 from ..serializers.diary_group_id_sz import DiaryGroupIdSZ
 from rest_framework import status
