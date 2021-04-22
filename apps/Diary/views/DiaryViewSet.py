@@ -69,9 +69,6 @@ class DiaryViewSet(viewsets.GenericViewSet,
         serializer = DiarySZ(my_diaries, many=True)
         return Response(data=serializer.data)
 
-    @swagger_auto_schema(
-        responses={200: DiaryMemberSZ(many=True)}
-    )
     @action(methods=['get'], detail=True)
     def members(self, request, pk):
         '''
@@ -87,9 +84,6 @@ class DiaryViewSet(viewsets.GenericViewSet,
             return Response(data=status.HTTP_400_BAD_REQUEST, status=status.HTTP_400_BAD_REQUEST)
 
     @members.mapping.post
-    @swagger_auto_schema(
-        request_body=DiaryMemberSZ,
-    )
     def create_member(self, request, pk):
         '''
         다이어리에 가입
@@ -127,9 +121,6 @@ class DiaryViewSet(viewsets.GenericViewSet,
         """
         return Response(data=status.HTTP_400_BAD_REQUEST)
 
-    @swagger_auto_schema(
-        responses={200: DiaryGroupSZ(many=True)}
-    )
     @action(detail=True, methods=['get'])
     def group(self, request, pk):
         '''
@@ -143,14 +134,10 @@ class DiaryViewSet(viewsets.GenericViewSet,
         '''
         # pk는 diary의 pk이다.
         my_group = DiaryGroup.objects.filter(user=request.user)
-        group_serializer = DiaryGroupSZ(my_group, many=True, context={'request': request, 'diary_pk': pk})
+        group_serializer = DiaryGroupListSZ(my_group, many=True, context={'request': request, 'diary_pk': pk})
 
         return Response(data=group_serializer.data)
 
-    @swagger_auto_schema(
-        request_body=DiaryGroupIdSZ,
-        responses={200: DiaryGroupIdSZ}
-    )
     @group.mapping.post
     def add_group_member(self, request, pk):
         '''

@@ -22,3 +22,10 @@ class DiaryGroupSZ(ModelSerializer):
             return True
         else:
             return False
+
+class DiaryGroupCreateSZ(ModelSerializer):
+
+    class Meta:
+        model = DiaryGroup
+        fields = ('id', 'title', 'created_at', 'updated_at')
+        read_only_fields = ('id')
