@@ -37,3 +37,9 @@ class DiaryGroupRetriveSZ(WritableNestedModelSerializer):
     class Meta:
         model =DiaryGroup
         fields = ('id', 'title', 'user', 'diaries', 'created_at', 'updated_at', )
+
+class DiaryGroupUpdateDeleteSZ(ModelSerializer):
+
+    class Meta:
+        model = DiaryGroup
+        fields = ('id', 'title')

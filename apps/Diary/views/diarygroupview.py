@@ -1,9 +1,11 @@
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import action
 from rest_framework.response import Response
+
 from rest_framework.generics import ListCreateAPIView
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.generics import RetrieveUpdateDestroyAPIView
+
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
@@ -12,7 +14,7 @@ from ..models import DiaryGroup
 
 from ..serializers.diary_group_sz import DiaryGroupListSZ
 from ..serializers.diary_group_sz import DiaryGroupCreateSZ
-
+from ..serializers.diary_group_sz import DiaryGroupUpdateDeleteSZ
 from ..serializers.diary_group_member_sz import DiaryGroupMemberSZ
 
 from django.db import transaction
@@ -76,6 +78,11 @@ class ListCreateDiaryGroupView(ListCreateAPIView):
         return Response(data=serializer.data, status=status.HTTP_201_CREATED,
                         headers=self.get_success_headers(serializer.data))
 
-class RetrieveDiaryGroupView(RetrieveAPIView):
+
+class DiaryGroupDetailView(RetrieveUpdateDestroyAPIView):
     queryset = DiaryGroup.objects.all()
     serializer_class = DiaryGroupListSZ
+
+    def partial_update(self, request, *args, **kwargs):
+        kwargs['partial'] = True
+        return self.update(request, *args, **kwargs)
