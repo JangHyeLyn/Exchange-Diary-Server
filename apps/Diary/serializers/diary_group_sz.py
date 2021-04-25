@@ -1,5 +1,7 @@
+from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 from rest_framework.serializers import SerializerMethodField
+from rest_framework.serializers import DictField
 
 from drf_writable_nested.serializers import WritableNestedModelSerializer
 
@@ -12,7 +14,7 @@ class DiaryGroupListSZ(ModelSerializer):
     count = SerializerMethodField()
     class Meta:
         model = DiaryGroup
-        fields = ('id', 'title', 'user', 'count', 'created_at', 'updated_at',)
+        fields = ('id', 'title', 'rank', 'count', 'created_at', 'updated_at',)
 
     def get_count(self, obj):
         return obj.group_count(obj.pk)
@@ -33,10 +35,10 @@ class DiaryGroupCreateSZ(ModelSerializer):
 
 class DiaryGroupRetriveSZ(WritableNestedModelSerializer):
 
-    diaries = DiaryGroupMemberSZ(many=True)
     class Meta:
-        model =DiaryGroup
-        fields = ('id', 'title', 'user', 'diaries', 'created_at', 'updated_at', )
+        model = DiaryGroup
+        fields = ('id', 'title', 'user', 'rank', 'created_at', 'updated_at', )
+        read_only_fields = ('id', 'title', 'user', )
 
 class DiaryGroupUpdateDeleteSZ(ModelSerializer):
 

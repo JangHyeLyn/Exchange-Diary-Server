@@ -1,5 +1,6 @@
 from rest_framework.serializers import ModelSerializer
-from ..models import Diary, DiaryMember
+from ..models import Diary
+from ..models import DiaryMember
 
 
 class DiaryMemberSZ(ModelSerializer):

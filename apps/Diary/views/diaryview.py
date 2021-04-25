@@ -15,6 +15,30 @@ from ..serializers.diary_group_member_sz import DiaryGroupMemberSZ
 from ..serializers.diary_group_id_sz import DiaryGroupIdSZ
 from rest_framework import status
 
+from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
+
+
+class DiaryListCreateView(ListCreateAPIView):
+    queryset = Diary.objects.all()
+    serializer_class = DiarySZ
+    permission_classes = (
+        IsAuthenticated,
+    )
+
+    def get_queryset(self):
+        return Diary.objects.filter(user=self.request.user)
+
+class DiaryDetailView(RetrieveUpdateDestroyAPIView):
+    queryset = Diary.objects.all()
+    serializer_class = DiaryDetailSZ
+    permission_classes = (
+        IsAuthenticated,
+    )
+
+    def partial_update(self, request, *args, **kwargs):
+        kwargs['partial'] = True
+        return self.update(request, *args, **kwargs)
+
 
 class DiaryViewSet(viewsets.GenericViewSet,
                    mixins.ListModelMixin,

@@ -1,8 +1,12 @@
 from django.urls import path
 from rest_framework.routers import DefaultRouter
+
 from .views.diaryview import DiaryViewSet
+from .views.diaryview import DiaryListCreateView
+from .views.diaryview import DiaryDetailView
+
 from .views.diarygroupview import DiaryGroupViewSet
-from .views.diarygroupview import ListCreateDiaryGroupView
+from .views.diarygroupview import DiaryGroupListCreateUpdateView
 from .views.diarygroupview import DiaryGroupDetailView
 
 # router = DefaultRouter()
@@ -12,6 +16,11 @@ from .views.diarygroupview import DiaryGroupDetailView
 
 # urlpatterns = router.urls
 urlpatterns = [
-    path('diarygroups/', ListCreateDiaryGroupView.as_view(), name='diarygroup'),
+    # Diary
+    path('diaries/', DiaryListCreateView.as_view(), name='diary'),
+    path('diaries/<int:pk>/', DiaryDetailView.as_view(), name='diary_detail'),
+
+    # DiaryGroup
+    path('diarygroups/', DiaryGroupListCreateUpdateView.as_view(), name='diarygroup'),
     path("diarygroups/<int:pk>/", DiaryGroupDetailView.as_view(), name='diarygroup_detail'),
 ]
