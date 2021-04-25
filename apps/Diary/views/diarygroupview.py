@@ -97,6 +97,9 @@ class DiaryGroupListCreateUpdateView(ListCreateAPIView, UpdateAPIView):
 class DiaryGroupDetailView(RetrieveUpdateDestroyAPIView):
     queryset = DiaryGroup.objects.all()
     serializer_class = DiaryGroupListSZ
+    permission_classes = (
+        IsAuthenticated,
+    )
 
     def get(self, request, *args, **kwargs):
         serializer = DiaryGroupRetriveSZ(self.get_queryset().get(pk=kwargs['pk']))

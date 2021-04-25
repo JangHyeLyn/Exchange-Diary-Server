@@ -1,3 +1,4 @@
+from django.db import transaction
 from django.views import View
 from django.db.models import Q
 from drf_yasg.utils import swagger_auto_schema
@@ -28,6 +29,11 @@ class DiaryListCreateView(ListCreateAPIView):
     def get_queryset(self):
         return Diary.objects.filter(user=self.request.user)
 
+    # @transaction.atomic()
+    # def post(self, request, *args, **kwargs):
+    #
+    #     pass
+
 class DiaryDetailView(RetrieveUpdateDestroyAPIView):
     queryset = Diary.objects.all()
     serializer_class = DiaryDetailSZ
@@ -35,7 +41,7 @@ class DiaryDetailView(RetrieveUpdateDestroyAPIView):
         IsAuthenticated,
     )
 
-    def partial_update(self, request, *args, **kwargs):
+    def patch(self, request, *args, **kwargs):
         kwargs['partial'] = True
         return self.update(request, *args, **kwargs)
 
