@@ -22,9 +22,9 @@ from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIV
 class DiaryListCreateView(ListCreateAPIView):
     queryset = Diary.objects.all()
     serializer_class = DiarySZ
-    permission_classes = (
-        IsAuthenticated,
-    )
+    # permission_classes = (
+    #     IsAuthenticated,
+    # )
 
     def get_queryset(self):
         return Diary.objects.filter(user=self.request.user)
