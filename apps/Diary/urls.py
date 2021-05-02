@@ -4,6 +4,7 @@ from rest_framework.routers import DefaultRouter
 from .views.diaryview import DiaryViewSet
 from .views.diaryview import DiaryListCreateView
 from .views.diaryview import DiaryDetailView
+from .views.diaryview import DiaryMeView
 
 from .views.diarygroupview import DiaryGroupViewSet
 from .views.diarygroupview import DiaryGroupListCreateUpdateView
@@ -17,8 +18,9 @@ from .views.diarygroupview import DiaryGroupDetailView
 # urlpatterns = router.urls
 urlpatterns = [
     # Diary
-    path('diaries/', DiaryListCreateView.as_view(), name='diary'),
+    # path('diaries/', DiaryListCreateView.as_view(), name='diary'),
     path('diaries/<int:pk>/', DiaryDetailView.as_view(), name='diary_detail'),
+    path('diaries/me/',DiaryMeView.as_view(), name='diary_me'),
 
     # DiaryGroup
     path('diarygroups/', DiaryGroupListCreateUpdateView.as_view(), name='diarygroup'),

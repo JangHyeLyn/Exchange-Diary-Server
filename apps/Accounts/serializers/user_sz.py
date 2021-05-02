@@ -10,4 +10,10 @@ class UserSZ(ModelSerializer):
 
     class Meta:
         model = get_user_model()
-        fields = ['id', 'username', 'email','description', 'profile_img', 'diary_set', 'now_writer_set']
+        fields = ['id', 'username', 'email', 'description', 'profile_img', 'diary_set', 'now_writer_set']
+
+class UserUpdateSZ(ModelSerializer):
+    class Meta:
+        model = get_user_model()
+        fields = ['id', 'username', 'email', 'description', 'profile_img']
+        read_only_fields = ('id', 'email',)

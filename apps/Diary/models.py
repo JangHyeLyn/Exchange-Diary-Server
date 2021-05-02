@@ -17,6 +17,7 @@ class Diary(BaseModel):
     total_page = models.IntegerField(default=20)
     now_writer = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='now_writers')
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='diaries')
+    cover = models.IntegerField(default=1)
 
     def __str__(self):
         return self.title

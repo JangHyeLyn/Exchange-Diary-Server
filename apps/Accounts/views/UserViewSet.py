@@ -1,11 +1,16 @@
+from rest_framework.generics import RetrieveUpdateDestroyAPIView, RetrieveAPIView, RetrieveUpdateAPIView
+
+from django.shortcuts import get_object_or_404
 from ..models import User
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
+
 from ..permissions import IsSelf
 from ..serializers.user_sz import UserSZ
+from ..serializers.user_sz import UserUpdateSZ
 from django.contrib.auth import get_user_model
 
 
@@ -50,3 +55,29 @@ class UserViewSet(ModelViewSet):
             return Response(data=serializer.data)
         else:
             return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class UserDetailView(RetrieveUpdateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSZ
+
+    def get_queryset(self):
+        return User.objects.filter(user=self.request.user)
+
+    def get_object(self):
+        return User.objects.get(pk=self.request.user.id)
+
+    def get(self, request, *args, **kwargs):
+        request_user = get_object_or_404(User, pk=kwargs['pk'])
+        serializer = self.get_serializer(request_user)
+        return Response(data=serializer.data, status=status.HTTP_200_OK)
+
+class UserMeView(RetrieveUpdateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSZ
+
+    def get_object(self):
+        return User.objects.get(pk=self.request.user.id)
+
+    def get(self, request, *args, **kwargs):
+        serializer = self.get_serializer(self.get_object())
+        return Response(data=serializer.data, status=status.HTTP_200_OK)

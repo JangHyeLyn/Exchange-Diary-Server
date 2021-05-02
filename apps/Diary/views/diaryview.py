@@ -1,38 +1,49 @@
 from django.db import transaction
 from django.views import View
-from django.db.models import Q
-from drf_yasg.utils import swagger_auto_schema
+from django.shortcuts import get_object_or_404
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import action
 from rest_framework import status, viewsets, mixins
+
+from config.pagination import LargeResultsSetPagination
 from ..models import Diary, DiaryMember, DiaryGroup, DiaryGroupMember
 from ..permissions import IsSelf
 from rest_framework.response import Response
-from ..serializers.diary_sz import DiarySZ, DiaryDetailSZ
+
+from ..serializers.diary_sz import DiarySZ
+from ..serializers.diary_sz import DiaryDetailSZ
+from ..serializers.diary_sz import DiaryMeSZ
+
 from ..serializers.diary_member_sz import DiaryMemberSZ
+
 from ..serializers.diary_group_sz import DiaryGroupListSZ
 from ..serializers.diary_group_member_sz import DiaryGroupMemberSZ
-from ..serializers.diary_group_id_sz import DiaryGroupIdSZ
+
 from rest_framework import status
 
-from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.generics import ListCreateAPIView
+from rest_framework.generics import RetrieveUpdateDestroyAPIView
+from rest_framework.generics import RetrieveAPIView
+from rest_framework.generics import CreateAPIView
+from rest_framework.generics import ListAPIView
 
 
 class DiaryListCreateView(ListCreateAPIView):
     queryset = Diary.objects.all()
     serializer_class = DiarySZ
-    # permission_classes = (
-    #     IsAuthenticated,
-    # )
 
     def get_queryset(self):
         return Diary.objects.filter(user=self.request.user)
 
-    # @transaction.atomic()
-    # def post(self, request, *args, **kwargs):
-    #
-    #     pass
+    def post(self, request, *args, **kwargs):
+        if 'group' in request.data:
+            try:
+                DiaryGroup.objects.get(user=request.user, pk=request.data.get('group'))
+            except DiaryGroup.DoesNotExist as e:
+                return Response(data=str(e), status=status.HTTP_400_BAD_REQUEST)
+        return self.create(request, *args, **kwargs)
+
 
 class DiaryDetailView(RetrieveUpdateDestroyAPIView):
     queryset = Diary.objects.all()
@@ -45,6 +56,12 @@ class DiaryDetailView(RetrieveUpdateDestroyAPIView):
         kwargs['partial'] = True
         return self.update(request, *args, **kwargs)
 
+class DiaryMeView(ListAPIView):
+    queryset = Diary.objects.all()
+    serializer_class = DiaryMeSZ
+
+    def get_queryset(self):
+        return Diary.objects.filter(user=self.request.user)
 
 class DiaryViewSet(viewsets.GenericViewSet,
                    mixins.ListModelMixin,

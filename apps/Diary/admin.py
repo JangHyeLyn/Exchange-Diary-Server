@@ -10,7 +10,8 @@ class DiaryAdmin(admin.ModelAdmin):
 
 @admin.register(DiaryGroup)
 class DiaryGroupAdmin(admin.ModelAdmin):
-    list_display = ['title', 'user']
+    list_display = ['pk', 'title', 'user']
+    ordering = ['-pk']
 
 @admin.register(DiaryGroupMember)
 class DiaryGroupMember(admin.ModelAdmin):
