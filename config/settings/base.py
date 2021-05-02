@@ -1,18 +1,14 @@
 import datetime
 import sys
-from datetime import timedelta
 
-from .secret import SECRET
+from config.settings.secret import SECRET
 import os
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 SECRET_KEY = SECRET['SECRET_KEY']
 DEBUG = True
 
-## add to apps directory path
-PARENT_DIR = os.path.abspath(os.path.join(BASE_DIR))
-sys.path.insert(0, os.path.join(PARENT_DIR, 'apps'))
 
 INSTALLED_APPS = [
     # Django
@@ -27,6 +23,7 @@ INSTALLED_APPS = [
     'Accounts',
     'Diary',
     'KakaoOauth',
+    'notification',
 
     ## 3rd party
     'rest_framework',
@@ -63,7 +60,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            os.path.join(BASE_DIR, 'apps', 'KakaoOauth', 'templates')
+            os.path.join(BASE_DIR, 'Exchange-Diary-Server/../../apps', 'KakaoOauth', 'templates')
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -115,9 +112,9 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
+    os.path.join(BASE_DIR, 'Exchange-Diary-Server/../../static'),
 ]
-STATIC_ROOT = os.path.join(BASE_DIR, 'deploy_static')
+STATIC_ROOT = os.path.join(BASE_DIR, 'Exchange-Diary-Server/../../deploy_static')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -147,9 +144,7 @@ REST_AUTH_SERIALIZERS = {
 JWT_AUTH = {
     'JWT_SECRET_KEY': SECRET['SECRET_KEY'],
     'JWt_ALGORITHM': 'HS256',
-    'JWT_ALLOW_REFRESH': True,
-    'JWT_EXPIRATION_DELTA': datetime.timedelta(days=9999),
-    'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=9999)
+    'JWT_VERIFY_EXPIRATION': False
 }
 
 REST_USE_JWT = True
@@ -170,3 +165,16 @@ SOCIALACCOUNT_ADAPTER = 'KakaoOauth.adapter.SocialAccountRegisterAdapter'
 
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'path/to/store/my/files/')
+
+# celery
+CELERY_BROKER_URL = 'redis://localhost:6379'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_RESULT_BACKEND = 'redis://localhost:6379'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Asia/Seoul'
+
+INSTALLED_APPS += (
+    'django_celery_beat',
+    'django_celery_results',
+)

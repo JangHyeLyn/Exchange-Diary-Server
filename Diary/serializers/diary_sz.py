@@ -24,7 +24,6 @@ class DiarySZ(ModelSerializer):
         return diary
 
 
-
 class DiaryDetailSZ(ModelSerializer):
     # members = DiaryMemberSZ(many=True, read_only=True)
     group = serializers.SerializerMethodField()

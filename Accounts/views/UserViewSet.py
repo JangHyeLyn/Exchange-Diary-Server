@@ -81,3 +81,6 @@ class UserMeView(RetrieveUpdateAPIView):
     def get(self, request, *args, **kwargs):
         serializer = self.get_serializer(self.get_object())
         return Response(data=serializer.data, status=status.HTTP_200_OK)
+
+    def patch(self, request, *args, **kwargs):
+        return self.partial_update(request, *args, **kwargs)
