@@ -39,7 +39,7 @@ class DiaryDetailSZ(ModelSerializer):
         try:
             group_member = DiaryGroupMember.objects.get(diary=obj)
             return group_member.group_id
-        except DiaryGroup.DoesNotExist:
+        except DiaryGroupMember.DoesNotExist:
             return 0
 
 class DiaryMeSZ(ModelSerializer):
