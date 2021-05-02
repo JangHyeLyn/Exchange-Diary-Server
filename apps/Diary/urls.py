@@ -18,7 +18,7 @@ from .views.diarygroupview import DiaryGroupDetailView
 # urlpatterns = router.urls
 urlpatterns = [
     # Diary
-    # path('diaries/', DiaryListCreateView.as_view(), name='diary'),
+    path('diaries/', DiaryListCreateView.as_view(), name='diary'),
     path('diaries/<int:pk>/', DiaryDetailView.as_view(), name='diary_detail'),
     path('diaries/me/',DiaryMeView.as_view(), name='diary_me'),
 
