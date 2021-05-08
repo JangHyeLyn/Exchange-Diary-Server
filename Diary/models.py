@@ -15,9 +15,10 @@ class Diary(BaseModel):
     title = models.CharField(max_length=30)
     now_page = models.IntegerField(default=1)
     total_page = models.IntegerField(default=20)
-    now_writer = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='now_writers')
-    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='diaries')
+    now_writer = models.ForeignKey(get_user_model(), on_delete=models.SET_NULL, null=True, related_name='now_writers')
+    user = models.ForeignKey(get_user_model(), on_delete=models.SET_NULL, null=True, related_name='diaries')
     cover = models.IntegerField(default=1)
+    promise = models.CharField(max_length=500, null=True, blank=True)
 
     def __str__(self):
         return self.title
@@ -28,8 +29,8 @@ class Diary(BaseModel):
 
 class DiaryMember(BaseModel):
     nickname = models.CharField(max_length=20, blank=True)
-    diary = models.ForeignKey(Diary, on_delete=models.CASCADE, related_name='members')
-    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='joins')
+    diary = models.ForeignKey(Diary, on_delete=models.CASCADE, null=True, related_name='members')
+    user = models.ForeignKey(get_user_model(), on_delete=models.SET_NULL, null=True, related_name='joins')
 
     def __str__(self):
         return self.nickname
@@ -37,7 +38,7 @@ class DiaryMember(BaseModel):
 
 class DiaryGroup(BaseModel):
     title = models.CharField(max_length=30)
-    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='user_diary_group_set')
+    user = models.ForeignKey(get_user_model(), on_delete=models.SET_NULL, null=True, related_name='user_diary_group_set')
     rank = models.IntegerField(default=1)
 
     def __str__(self):
@@ -66,8 +67,8 @@ class DiaryGroup(BaseModel):
 
 
 class DiaryGroupMember(BaseModel):
-    group = models.ForeignKey(DiaryGroup, on_delete=models.CASCADE, related_name='members', null=True, blank=True)
-    diary = models.ForeignKey(Diary, on_delete=models.CASCADE, related_name='group', blank=True, null=True)
+    group = models.ForeignKey(DiaryGroup, on_delete=models.SET_NULL, null=True, related_name='members', blank=True)
+    diary = models.ForeignKey(Diary, on_delete=models.SET_NULL, null=True, related_name='group', blank=True)
 
     class Meta:
         ordering = ['pk']

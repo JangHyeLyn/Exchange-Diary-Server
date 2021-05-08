@@ -7,6 +7,7 @@ from rest_framework.decorators import action
 from rest_framework import status, viewsets, mixins
 
 from config.pagination import LargeResultsSetPagination
+from Diary.tasks import add
 from ..models import Diary, DiaryMember, DiaryGroup, DiaryGroupMember
 from ..permissions import IsSelf
 from rest_framework.response import Response
@@ -28,6 +29,7 @@ from rest_framework.generics import RetrieveAPIView
 from rest_framework.generics import CreateAPIView
 from rest_framework.generics import ListAPIView
 
+from ..tasks import add
 
 class DiaryListCreateView(ListCreateAPIView):
     queryset = Diary.objects.all()
@@ -36,12 +38,14 @@ class DiaryListCreateView(ListCreateAPIView):
     def get_queryset(self):
         return Diary.objects.filter(user=self.request.user)
 
+    @transaction.atomic()
     def post(self, request, *args, **kwargs):
         if 'group' in request.data:
             try:
                 DiaryGroup.objects.get(user=request.user, pk=request.data.get('group'))
             except DiaryGroup.DoesNotExist as e:
                 return Response(data=str(e), status=status.HTTP_400_BAD_REQUEST)
+
         return self.create(request, *args, **kwargs)
 
 
@@ -54,14 +58,33 @@ class DiaryDetailView(RetrieveUpdateDestroyAPIView):
 
     def patch(self, request, *args, **kwargs):
         kwargs['partial'] = True
+        add.delay()
         return self.update(request, *args, **kwargs)
 
-class DiaryMeView(ListAPIView):
+class DiaryMeListView(ListAPIView):
     queryset = Diary.objects.all()
     serializer_class = DiaryMeSZ
 
     def get_queryset(self):
         return Diary.objects.filter(user=self.request.user)
+
+class DiaryMemberListCreateView(ListCreateAPIView):
+    queryset = DiaryMember
+    serializer_class = DiaryMemberSZ
+
+    def get_queryset(self):
+        return DiaryMember.objects.filter(diary_id=self.kwargs.get('pk'))
+
+    def post(self, request, *args, **kwargs):
+        pass
+
+class DiaryMemberDetailView(RetrieveAPIView):
+    queryset = DiaryMember
+    serializer_class = DiaryMemberSZ
+
+    def get_queryset(self):
+        return DiaryMember.objects.filter(diary_id=self.kwargs.get('pk'))
+
 
 class DiaryViewSet(viewsets.GenericViewSet,
                    mixins.ListModelMixin,

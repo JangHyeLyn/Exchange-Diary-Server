@@ -5,6 +5,7 @@ from Accounts.serializers.user_diary_sz import UserDiarySZ
 from .diary_member_sz import DiaryMemberSZ
 from rest_framework import serializers
 from ..models import Diary
+from ..models import DiaryMember
 from ..models import DiaryGroup
 from ..models import DiaryGroupMember
 

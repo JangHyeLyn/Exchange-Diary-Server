@@ -3,7 +3,11 @@ import sys
 
 from config.settings.secret import SECRET
 import os
+# import djcelery
 
+# djcelery.setup_loader()
+
+BROKER_URL = "amqp://guest:guest@localhost:5672//"
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 SECRET_KEY = SECRET['SECRET_KEY']
@@ -41,6 +45,8 @@ INSTALLED_APPS = [
     # provider
     'allauth.socialaccount',
     'allauth.socialaccount.providers.kakao',
+
+    # 'djcelery',
 ]
 
 SITE_ID = 1
