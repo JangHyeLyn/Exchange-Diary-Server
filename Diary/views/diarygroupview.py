@@ -20,7 +20,7 @@ from ..serializers.diary_group_sz import DiaryGroupUpdateDeleteSZ
 from ..serializers.diary_group_member_sz import DiaryGroupMemberSZ
 
 from django.db import transaction
-
+from django.shortcuts import get_object_or_404
 
 class DiaryGroupViewSet(ModelViewSet):
     queryset = DiaryGroup.objects.all()
@@ -102,7 +102,8 @@ class DiaryGroupDetailView(RetrieveUpdateDestroyAPIView):
     )
 
     def get(self, request, *args, **kwargs):
-        serializer = DiaryGroupRetriveSZ(self.get_queryset().get(pk=kwargs['pk']))
+        diarygroup = get_object_or_404(DiaryGroup, pk=kwargs['pk'])
+        serializer = DiaryGroupRetriveSZ(diarygroup)
         data = dict(
             diary_group=serializer.data
         )
