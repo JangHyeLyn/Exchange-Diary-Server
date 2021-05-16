@@ -61,9 +61,7 @@ class DiaryGroup(BaseModel):
     @transaction.atomic()
     def group_rank_update(cls, datas):
         for data in datas:
-            group = DiaryGroup.objects.get(pk=data.get('id'))
-            group.rank = data.get('rank')
-            group.save()
+            DiaryGroup.objects.filter(pk=data.get('id')).update(rank=data.get('rank'))
 
 
 class DiaryGroupMember(BaseModel):

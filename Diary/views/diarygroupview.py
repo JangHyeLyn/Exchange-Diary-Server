@@ -85,7 +85,7 @@ class DiaryGroupListCreateUpdateView(ListCreateAPIView, UpdateAPIView):
                         headers=self.get_success_headers(serializer.data))
 
     def patch(self, request, *args, **kwargs):
-        DiaryGroup.group_rank_update(data=request.data)
+        DiaryGroup.group_rank_update(datas=request.data)
         serializer = DiaryGroupListSZ(self.get_queryset(), many=True)
         data = dict(
             not_join_group_cnt=DiaryGroup.not_join_group_count(user=request.user),
