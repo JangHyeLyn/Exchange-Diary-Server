@@ -1,7 +1,7 @@
 from django.urls import path
 from rest_framework.routers import DefaultRouter
 
-from .views.diaryview import DiaryViewSet
+# from .views.diaryview import DiaryViewSet
 from .views.diaryview import DiaryListCreateView
 from .views.diaryview import DiaryDetailView
 from .views.diaryview import DiaryMeListView

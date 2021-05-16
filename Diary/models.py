@@ -19,6 +19,7 @@ class Diary(BaseModel):
     user = models.ForeignKey(get_user_model(), on_delete=models.SET_NULL, null=True, related_name='diaries')
     cover = models.IntegerField(default=1)
     promise = models.CharField(max_length=500, null=True, blank=True)
+    group = models.ForeignKey('DiaryGroup', default=None, on_delete=models.SET_NULL, null=True, related_name='diaries')
 
     def __str__(self):
         return self.title
@@ -38,7 +39,8 @@ class DiaryMember(BaseModel):
 
 class DiaryGroup(BaseModel):
     title = models.CharField(max_length=30)
-    user = models.ForeignKey(get_user_model(), on_delete=models.SET_NULL, null=True, related_name='user_diary_group_set')
+    user = models.ForeignKey(get_user_model(), on_delete=models.SET_NULL, null=True,
+                             related_name='user_diary_group_set')
     rank = models.IntegerField(default=1)
 
     def __str__(self):
@@ -49,27 +51,27 @@ class DiaryGroup(BaseModel):
 
     @classmethod
     def group_count(cls, pk):
-        group = DiaryGroup.objects.get(pk=pk)
-        group_member_count = group.members.all().count()
-        return group_member_count
+        return cls.objects.prefetch_related('diaries').get(pk=pk).diaries.count()
 
-    @classmethod
-    def not_join_group_count(cls, user):
+    @staticmethod
+    def not_join_group_count(user):
         return Diary.objects.filter(user=user, group__isnull=True).count()
 
     @classmethod
-    @transaction.atomic()
     def group_rank_update(cls, datas):
         for data in datas:
             DiaryGroup.objects.filter(pk=data.get('id')).update(rank=data.get('rank'))
 
+    @classmethod
+    def get_next_group_rank(cls, user):
+        return cls.objects.filter(user=user).last().rank + 1
 
-class DiaryGroupMember(BaseModel):
-    group = models.ForeignKey(DiaryGroup, on_delete=models.SET_NULL, null=True, related_name='members', blank=True)
-    diary = models.ForeignKey(Diary, on_delete=models.SET_NULL, null=True, related_name='group', blank=True)
-
-    class Meta:
-        ordering = ['pk']
-
-    def __str__(self):
-        return self.diary.title
+# class DiaryGroupMember(BaseModel):
+#     group = models.ForeignKey(DiaryGroup, on_delete=models.SET_NULL, null=True, related_name='members', blank=True)
+#     diary = models.ForeignKey(Diary, on_delete=models.SET_NULL, null=True, related_name='groupqwer', blank=True)
+#
+#     class Meta:
+#         ordering = ['pk']
+#
+#     def __str__(self):
+#         return self.diary.title

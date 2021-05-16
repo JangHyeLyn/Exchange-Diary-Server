@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Diary, DiaryMember, DiaryGroup, DiaryGroupMember   # , DiaryContent
+from .models import Diary, DiaryMember, DiaryGroup   # , DiaryContent
 
 
 @admin.register(Diary)
@@ -13,9 +13,9 @@ class DiaryGroupAdmin(admin.ModelAdmin):
     list_display = ['pk', 'title', 'user']
     ordering = ['-pk']
 
-@admin.register(DiaryGroupMember)
-class DiaryGroupMember(admin.ModelAdmin):
-    pass
+# @admin.register(DiaryGroupMember)
+# class DiaryGroupMember(admin.ModelAdmin):
+#     pass
 
 # @admin.register(DiaryContent)
 # class DiaryContentAdmin(admin.ModelAdmin):

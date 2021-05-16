@@ -17,7 +17,8 @@ from ..serializers.diary_group_sz import DiaryGroupListSZ
 from ..serializers.diary_group_sz import DiaryGroupRetriveSZ
 from ..serializers.diary_group_sz import DiaryGroupCreateSZ
 from ..serializers.diary_group_sz import DiaryGroupUpdateDeleteSZ
-from ..serializers.diary_group_member_sz import DiaryGroupMemberSZ
+from ..serializers.diary_sz import DiaryInGroupSZ
+# from ..serializers.diary_group_member_sz import DiaryGroupMemberSZ
 
 from django.db import transaction
 from django.shortcuts import get_object_or_404
@@ -40,23 +41,6 @@ class DiaryGroupViewSet(ModelViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(data=serializer.data)
-
-    @action(detail=True, methods=['get'], url_path='members')
-    def member(self, request, pk):
-        members = self.get_object().members.all()
-        serializer = DiaryGroupMemberSZ(members, many=True)
-
-        return Response(data=serializer.data)
-
-    @member.mapping.post
-    def create_member(self, request, pk):
-        diary_list = request.data.get('diary_list')
-        print(diary_list)
-        return Response(data=None)
-
-    @member.mapping.delete
-    def delete_member(self, request, pk):
-        pass
 
 
 class DiaryGroupListCreateUpdateView(ListCreateAPIView, UpdateAPIView):
@@ -103,9 +87,11 @@ class DiaryGroupDetailView(RetrieveUpdateDestroyAPIView):
 
     def get(self, request, *args, **kwargs):
         diarygroup = get_object_or_404(DiaryGroup, pk=kwargs['pk'])
-        serializer = DiaryGroupRetriveSZ(diarygroup)
+        diarygroup_serializer = DiaryGroupRetriveSZ(diarygroup)
+        diaries_serializer = DiaryInGroupSZ(diarygroup.diaries.all(), many=True)
         data = dict(
-            diary_group=serializer.data
+            diary_group=diarygroup_serializer.data,
+            diaries=diaries_serializer.data
         )
         return Response(data=data)
 

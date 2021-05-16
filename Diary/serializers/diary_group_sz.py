@@ -5,9 +5,9 @@ from rest_framework.serializers import DictField
 
 from drf_writable_nested.serializers import WritableNestedModelSerializer
 
-from .diary_group_member_sz import DiaryGroupMemberSZ
+# from .diary_group_member_sz import DiaryGroupMemberSZ
 from ..models import DiaryGroup
-from ..models import DiaryGroupMember
+# from ..models import DiaryGroupMember
 
 
 class DiaryGroupListSZ(ModelSerializer):
@@ -24,13 +24,14 @@ class DiaryGroupCreateSZ(ModelSerializer):
 
     class Meta:
         model = DiaryGroup
-        fields = ('id', 'title', 'user', 'created_at', 'updated_at',)
+        fields = ('id', 'title', 'user', 'rank', 'created_at', 'updated_at',)
         read_only_fields = ('id', 'user')
 
 
     def create(self, validated_data):
         user = self.context.get("request").user
-        diarygroup = DiaryGroup.objects.create(**validated_data, user=user)
+        rank = DiaryGroup.get_next_group_rank(user)
+        diarygroup = DiaryGroup.objects.create(**validated_data, user=user, rank=rank)
         return diarygroup
 
 class DiaryGroupRetriveSZ(WritableNestedModelSerializer):
