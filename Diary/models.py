@@ -64,7 +64,9 @@ class DiaryGroup(BaseModel):
 
     @classmethod
     def get_next_group_rank(cls, user):
-        return cls.objects.filter(user=user).last().rank + 1
+        if cls.objects.filter(user=user):
+            return cls.objects.filter(user=user).last().rank + 1
+        return 1
 
 # class DiaryGroupMember(BaseModel):
 #     group = models.ForeignKey(DiaryGroup, on_delete=models.SET_NULL, null=True, related_name='members', blank=True)

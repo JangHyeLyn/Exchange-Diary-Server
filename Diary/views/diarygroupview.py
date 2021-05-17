@@ -40,7 +40,7 @@ class DiaryGroupViewSet(ModelViewSet):
         serializer = DiaryGroupCreateSZ(self.get_queryset(), data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response(data=serializer.data)
+        return Response(status=status.HTTP_200_OK)
 
 
 class DiaryGroupListCreateUpdateView(ListCreateAPIView, UpdateAPIView):
