@@ -37,7 +37,7 @@ class DiaryListCreateView(ListCreateAPIView):
     serializer_class = DiarySZ
 
     def get_queryset(self):
-        return Diary.objects.filter(user=self.request.user)
+        return self.objects.filter(user=self.request.user)
 
 
 class DiaryDetailView(RetrieveUpdateDestroyAPIView):

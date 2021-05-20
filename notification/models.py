@@ -1,3 +1,5 @@
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from Diary.models import Diary
 from Accounts.models import User
@@ -28,3 +30,5 @@ class Notification(BaseModel):
     )
 
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='notifications')
+    diary = models.ForeignKey(Diary, on_delete=models.SET_NULL, null=True, related_name='notifications')
+    message = models.CharField(max_length=100)
