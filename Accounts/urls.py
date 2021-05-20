@@ -1,9 +1,9 @@
 from django.urls import path
 from rest_framework.routers import DefaultRouter
 
-from .views.UserViewSet import UserViewSet
-from .views.UserViewSet import UserDetailView
-from .views.UserViewSet import UserMeView
+from .views.user_view import UserViewSet
+from .views.user_view import UserDetailView
+from .views.user_view import UserMeView
 
 app_name = 'Accounts'
 # router = DefaultRouter()

@@ -2,15 +2,15 @@ from django.urls import path
 from rest_framework.routers import DefaultRouter
 
 # from .views.diaryview import DiaryViewSet
-from .views.diaryview import DiaryListCreateView
-from .views.diaryview import DiaryDetailView
-from .views.diaryview import DiaryMeListView
-from .views.diaryview import DiaryMemberListCreateView
-from .views.diaryview import DiaryMemberDetailView
+from .views.diary_view import DiaryListCreateView
+from .views.diary_view import DiaryDetailView
+from .views.diary_view import DiaryMeListView
+from .views.diary_view import DiaryMemberListCreateView
+from .views.diary_view import DiaryMemberDetailView
 
-from .views.diarygroupview import DiaryGroupViewSet
-from .views.diarygroupview import DiaryGroupListCreateUpdateView
-from .views.diarygroupview import DiaryGroupDetailView
+from .views.diary_group_view import DiaryGroupViewSet
+from .views.diary_group_view import DiaryGroupListCreateUpdateView
+from .views.diary_group_view import DiaryGroupDetailView
 
 
 # router = DefaultRouter()
