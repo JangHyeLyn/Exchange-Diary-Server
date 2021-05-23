@@ -10,6 +10,7 @@ urlpatterns = [
     # Local Apps
     path('api/v1/', include('Accounts.urls')),
     path('api/v1/', include('Diary.urls')),
+    path('api/v1/', include('notification.urls')),
 
     # api doc
     path('api/v1/', include('config.drf-yasg-urls')),

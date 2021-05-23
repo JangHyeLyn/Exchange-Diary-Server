@@ -12,16 +12,17 @@ class NotificationListSZ(ModelSerializer):
 
     class Meta:
         model = Notification
-        fields = ("id", "message", "created",)
+        fields = ("id", "diary_title", "diary_cover", "diary_status", "diary_group", "message", "created_at", "updated_at")
 
-    def get_diary_title(self):
-        pass
+    def get_diary_title(self, obj):
+        return obj.diary.title
+        return "diary_title"
 
-    def get_diary_cover(self):
-        pass
+    def get_diary_cover(self, obj):
+        return obj.diary.cover
 
-    def get_diary_status(self):
-        pass
+    def get_diary_status(self, obj):
+        return "diary_status"
 
-    def get_diary_group(self):
-        pass
+    def get_diary_group(self, obj):
+        return obj.diary.group if obj.diary.group else 0

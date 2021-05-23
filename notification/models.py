@@ -12,7 +12,6 @@ class BaseModel(models.Model):
     class Meta:
         abstract = True
 
-
 class Notification(BaseModel):
     NOTIFICATION_TEXT = (
         '1', '새로운 일기장에 초대 받았어요!',
@@ -32,3 +31,10 @@ class Notification(BaseModel):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='notifications')
     diary = models.ForeignKey(Diary, on_delete=models.SET_NULL, null=True, related_name='notifications')
     message = models.CharField(max_length=100)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    @property
+    def hi(self):
+        return "hi"

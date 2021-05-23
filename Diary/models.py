@@ -12,6 +12,10 @@ class BaseModel(models.Model):
 
 
 class Diary(BaseModel):
+    # STATUS_CHOICE = {
+    #     ("0" : ""),
+    #     ("1" : "")
+    # }
     title = models.CharField(max_length=30)
     now_page = models.IntegerField(default=1)
     total_page = models.IntegerField(default=20)
@@ -20,6 +24,8 @@ class Diary(BaseModel):
     cover = models.IntegerField(default=1)
     promise = models.CharField(max_length=500, null=True, blank=True)
     group = models.ForeignKey('DiaryGroup', default=None, on_delete=models.SET_NULL, null=True, related_name='diaries')
+    # TODO: 다이어리 상태 정의 해야됨 choice fields로 정의서 받으면 그때 진행
+    # status = models.
 
     def __str__(self):
         return self.title
