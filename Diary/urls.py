@@ -31,5 +31,5 @@ urlpatterns = [
 
     # DiaryMember
     path('diaries/<int:pk>/members/', DiaryMemberListCreateView.as_view(), name='diary_member'),
-    path('diaries/<int:diary_pk/members/<int:pk>/', DiaryMemberDetailView.as_view(), name='diary_member_detail'),
+    path('diaries/<int:diary_pk>/members/<int:pk>/', DiaryMemberDetailView.as_view(), name='diary_member_detail'),
 ]

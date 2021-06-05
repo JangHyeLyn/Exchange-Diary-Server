@@ -8,7 +8,9 @@ from rest_framework import status, viewsets, mixins
 
 from config.pagination import LargeResultsSetPagination
 from Diary.tasks import add
-from ..models import Diary, DiaryMember, DiaryGroup
+from Diary.models import Diary
+from Diary.models import DiaryMember
+from Diary.models import DiaryGroup
 from ..permissions import IsSelf
 from rest_framework.response import Response
 
@@ -24,6 +26,7 @@ from ..serializers.diary_group_sz import DiaryGroupListSZ
 from rest_framework import status
 
 from rest_framework.generics import ListCreateAPIView
+from rest_framework.generics import RetrieveUpdateAPIView
 from rest_framework.generics import RetrieveUpdateDestroyAPIView
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.generics import CreateAPIView
@@ -69,16 +72,43 @@ class DiaryMemberListCreateView(ListCreateAPIView):
         return DiaryMember.objects.filter(diary_id=self.kwargs.get('pk'))
 
     def post(self, request, *args, **kwargs):
-        pass
+        # TODO: 멤버 중복해서 생성하는거 해야됨 지금은 개발이라 안막아놓음
+        data = dict(
+            nickname=request.user.username,
+            user=request.user,
+            diary=self.kwargs.get('pk')
+        )
+        serializer = self.get_serializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=status.HTTP_200_OK, data=serializer.data)
+        return Response(status=status.HTTP_400_BAD_REQUEST, data="400 error")
 
 
-class DiaryMemberDetailView(RetrieveAPIView):
+class DiaryMemberDetailView(RetrieveUpdateAPIView):
     queryset = DiaryMember
     serializer_class = DiaryMemberSZ
 
     def get_queryset(self):
         return DiaryMember.objects.filter(diary_id=self.kwargs.get('pk'))
 
+    def get(self, request, *args, **kwargs):
+        return Response(status=status.HTTP_200_OK, data={"get": "get"})
+
+    def patch(self, request, *args, **kwargs):
+        data = dict(
+            nickname=request.POST.get('name'),
+            user=request.user,
+            diary=self.kwargs.get('pk')
+        )
+        serializer = self.get_serializer(data=data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+        return Response(status=status.HTTP_200_OK, data=serializer.data)
+
+# class DiaryNextWriter(RetrieveAPIView):
+#     queryset = Diary
+#     serializer_class =
 
 # class DiaryViewSet(viewsets.GenericViewSet,
 #                    mixins.ListModelMixin,
