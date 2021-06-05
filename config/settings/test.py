@@ -2,7 +2,7 @@ from .base import *
 
 ALLOWED_HOSTS = ['*']
 
-DATABASES = SECRET['DATABASE_DEV']
+DATABASES = SECRET['DATABASE_TEST']
 
 # aws s3
 AWS_ACCESS_KEY_ID = SECRET['AWS_ACCESS_KEY_ID'] # .csv 파일에 있는 내용을 입력 Access key ID

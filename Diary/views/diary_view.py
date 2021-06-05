@@ -14,11 +14,11 @@ from Diary.models import DiaryGroup
 from ..permissions import IsSelf
 from rest_framework.response import Response
 
-from ..serializers.diary_sz import DiarySZ
-from ..serializers.diary_sz import DiaryDetailSZ
-from ..serializers.diary_sz import DiaryMeSZ
+from Diary.serializers.diary_sz import DiarySZ
+from Diary.serializers.diary_sz import DiaryDetailSZ
+from Diary.serializers.diary_sz import DiaryMeSZ
 
-from ..serializers.diary_member_sz import DiaryMemberSZ
+from Diary.serializers.diary_member_sz import DiaryMemberSZ
 
 from ..serializers.diary_group_sz import DiaryGroupListSZ
 # from ..serializers.diary_group_member_sz import DiaryGroupMemberSZ
@@ -41,6 +41,18 @@ class DiaryListCreateView(ListCreateAPIView):
 
     def get_queryset(self):
         return self.objects.filter(user=self.request.user)
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            _, _ = DiaryMember.objects.get_or_create(
+                nickname=request.user.username,
+                diary_id=serializer.data.get('id'),
+                user=request.user
+            )
+            return Response(status=status.HTTP_200_OK, data=serializer.data)
+        return Response(status=status.HTTP_400_BAD_REQUEST, data=serializer.errors)
 
 
 class DiaryDetailView(RetrieveUpdateDestroyAPIView):
@@ -82,7 +94,7 @@ class DiaryMemberListCreateView(ListCreateAPIView):
         if serializer.is_valid():
             serializer.save()
             return Response(status=status.HTTP_200_OK, data=serializer.data)
-        return Response(status=status.HTTP_400_BAD_REQUEST, data="400 error")
+        return Response(status=status.HTTP_400_BAD_REQUEST, data=serializer.errors)
 
 
 class DiaryMemberDetailView(RetrieveUpdateAPIView):
@@ -104,7 +116,8 @@ class DiaryMemberDetailView(RetrieveUpdateAPIView):
         serializer = self.get_serializer(data=data, partial=True)
         if serializer.is_valid():
             serializer.save()
-        return Response(status=status.HTTP_200_OK, data=serializer.data)
+            return Response(status=status.HTTP_200_OK, data=serializer.data)
+        return Response(status=status.HTTP_400_BAD_REQUEST, data=serializer.errors)
 
 # class DiaryNextWriter(RetrieveAPIView):
 #     queryset = Diary

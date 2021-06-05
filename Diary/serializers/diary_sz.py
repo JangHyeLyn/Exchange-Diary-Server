@@ -1,5 +1,6 @@
 from django.db import transaction
 
+from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 from rest_framework.serializers import SerializerMethodField
 
@@ -18,6 +19,10 @@ class DiarySZ(ModelSerializer):
     @transaction.atomic()
     def create(self, validated_data):
         request = self.context.get("request")
+        try:
+            DiaryGroup.objects.get(pk=self.data.get('group'), user=request.user)
+        except DiaryGroup.DoesNotExist as e:
+            raise serializers.ValidationError({'group': e})
         diary = Diary.objects.create(**validated_data, user=request.user, now_writer=request.user)
         return diary
 

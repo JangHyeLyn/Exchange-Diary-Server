@@ -12,7 +12,7 @@ SECRET = {
         }
     },
 
-    'DATABASE': {
+    'DATABASE_DEV': {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
             'NAME': 'exchange',
@@ -25,7 +25,19 @@ SECRET = {
             }
         }
     },
-
+    'DATABASE_TEST': {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': 'exchange_test',
+            'USER': 'root',
+            'PASSWORD': 'schwisestudy',
+            'HOST': 'wisestudy.cinqw7ouyrxc.ap-northeast-2.rds.amazonaws.com',
+            'PORT': 3306,
+            'OPTIONS': {
+                'init_command': 'SET sql_mode="STRICT_TRANS_TABLES"'
+            }
+        }
+    },
     'AWS_ACCESS_KEY_ID': 'AKIAWVQALOFDSSIOX7S2',
     'AWS_SECRET_ACCESS_KEY': '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'
 }
