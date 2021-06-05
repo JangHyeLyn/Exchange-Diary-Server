@@ -4,3 +4,5 @@ django-rest-auth
 django-allauth
 djangorestframework-jwt
 pillow
+boto3
+django-storages

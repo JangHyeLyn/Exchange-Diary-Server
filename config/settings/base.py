@@ -1,20 +1,18 @@
 import datetime
 import sys
-from datetime import timedelta
 
-from .secret import SECRET
+from config.settings.secret import SECRET
 import os
+# import djcelery
 
-from .. import settings
+# djcelery.setup_loader()
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+BROKER_URL = "amqp://guest:guest@localhost:5672//"
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 SECRET_KEY = SECRET['SECRET_KEY']
 DEBUG = True
 
-## add to apps directory path
-PARENT_DIR = os.path.abspath(os.path.join(BASE_DIR))
-sys.path.insert(0, os.path.join(PARENT_DIR, 'apps'))
 
 INSTALLED_APPS = [
     # Django
@@ -29,6 +27,7 @@ INSTALLED_APPS = [
     'Accounts',
     'Diary',
     'KakaoOauth',
+    'notification',
 
     ## 3rd party
     'rest_framework',
@@ -40,9 +39,14 @@ INSTALLED_APPS = [
     'allauth.account',
     'rest_auth.registration',
 
+    'storages',
+    'drf_yasg',
+
     # provider
     'allauth.socialaccount',
     'allauth.socialaccount.providers.kakao',
+
+    # 'djcelery',
 ]
 
 SITE_ID = 1
@@ -62,7 +66,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            os.path.join(BASE_DIR, 'apps', 'KakaoOauth', 'templates')
+            os.path.join(BASE_DIR, 'Exchange-Diary-Server/../../apps', 'KakaoOauth', 'templates')
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -113,16 +117,28 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'Exchange-Diary-Server/../../static'),
+]
+STATIC_ROOT = os.path.join(BASE_DIR, 'Exchange-Diary-Server/../../deploy_static')
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Rest Framework
 REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
-    ),
-
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
-    )
+    ),
+
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10,
+
+
+    'DEFAULT_RENDERER_CLASSES': [
+        'config.renderers.CustomRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
+    ]
 }
 
 # rest-auth/kakao 호출시 response되는 user 정보 custom serializer
@@ -130,14 +146,11 @@ REST_AUTH_SERIALIZERS = {
     'USER_DETAILS_SERIALIZER': 'KakaoOauth.serializers.KakaoUserSerializer',
 }
 
-
 # djangorestframework-jwt
 JWT_AUTH = {
     'JWT_SECRET_KEY': SECRET['SECRET_KEY'],
     'JWt_ALGORITHM': 'HS256',
-    'JWT_ALLOW_REFRESH': True,
-    'JWT_EXPIRATION_DELTA': datetime.timedelta(days=7),
-    'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=28)
+    'JWT_VERIFY_EXPIRATION': False
 }
 
 REST_USE_JWT = True
@@ -153,3 +166,21 @@ ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ## auth PROVIDERS and ADAPTER
 SOCIALACCOUNT_PROVIDERS = SECRET['SOCIALACCOUNT_PROVIDERS']
 SOCIALACCOUNT_ADAPTER = 'KakaoOauth.adapter.SocialAccountRegisterAdapter'
+
+
+
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'path/to/store/my/files/')
+
+# celery
+CELERY_BROKER_URL = 'redis://localhost:6379'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_RESULT_BACKEND = 'redis://localhost:6379'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Asia/Seoul'
+
+INSTALLED_APPS += (
+    'django_celery_beat',
+    'django_celery_results',
+)
