@@ -39,6 +39,8 @@ class DiaryMember(BaseModel):
     nickname = models.CharField(max_length=20, blank=True)
     diary = models.ForeignKey(Diary, on_delete=models.CASCADE, null=True, related_name='members')
     user = models.ForeignKey(get_user_model(), on_delete=models.SET_NULL, null=True, related_name='joins')
+    profile_img = models.ImageField(blank=True, null=True, upload_to="accounts/profile/%Y/%m/%d/%H/%M/%S",
+                                    help_text="48px * 48px 크기의 png/jpg 파일을 업로드해주세요.")
 
     def __str__(self):
         return self.nickname

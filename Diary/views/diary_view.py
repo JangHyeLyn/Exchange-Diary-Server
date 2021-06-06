@@ -19,9 +19,7 @@ from Diary.serializers.diary_sz import DiaryDetailSZ
 from Diary.serializers.diary_sz import DiaryMeSZ
 
 from Diary.serializers.diary_member_sz import DiaryMemberSZ
-
-from ..serializers.diary_group_sz import DiaryGroupListSZ
-# from ..serializers.diary_group_member_sz import DiaryGroupMemberSZ
+from Diary.serializers.diary_member_sz import DiaryMemberMeSZ
 
 from rest_framework import status
 
@@ -45,13 +43,14 @@ class DiaryListCreateView(ListCreateAPIView):
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
-            _, _ = DiaryMember.objects.get_or_create(
+            diary = serializer.save()
+            DiaryMember.objects.get_or_create(
                 nickname=request.user.username,
                 diary_id=serializer.data.get('id'),
                 user=request.user
             )
-            return Response(status=status.HTTP_200_OK, data=serializer.data)
+            serializer_data = self.get_serializer(diary).data
+            return Response(status=status.HTTP_200_OK, data=serializer_data)
         return Response(status=status.HTTP_400_BAD_REQUEST, data=serializer.errors)
 
 
@@ -81,31 +80,30 @@ class DiaryMemberListCreateView(ListCreateAPIView):
     serializer_class = DiaryMemberSZ
 
     def get_queryset(self):
-        return DiaryMember.objects.filter(diary_id=self.kwargs.get('pk'))
+        return DiaryMember.objects.filter(diary_id=self.kwargs.get('diary_pk'))
 
     def post(self, request, *args, **kwargs):
-        # TODO: 멤버 중복해서 생성하는거 해야됨 지금은 개발이라 안막아놓음
-        data = dict(
-            nickname=request.user.username,
-            user=request.user,
-            diary=self.kwargs.get('pk')
-        )
-        serializer = self.get_serializer(data=data)
+        serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
-            return Response(status=status.HTTP_200_OK, data=serializer.data)
+            diary_member = serializer.save()
+            serializer_data = self.get_serializer(diary_member).data
+            return Response(status=status.HTTP_200_OK, data=serializer_data)
         return Response(status=status.HTTP_400_BAD_REQUEST, data=serializer.errors)
 
 
-class DiaryMemberDetailView(RetrieveUpdateAPIView):
+class DiaryMemberMeView(RetrieveUpdateAPIView):
     queryset = DiaryMember
-    serializer_class = DiaryMemberSZ
+    serializer_class = DiaryMemberMeSZ
 
     def get_queryset(self):
-        return DiaryMember.objects.filter(diary_id=self.kwargs.get('pk'))
+        return DiaryMember.objects.filter(diary_id=self.kwargs.get('diary_pk'), user=self.request.user)
+
+    def get_object(self):
+        return get_object_or_404(DiaryMember, diary_id=self.kwargs.get('diary_pk'), user=self.request.user)
 
     def get(self, request, *args, **kwargs):
-        return Response(status=status.HTTP_200_OK, data={"get": "get"})
+        serializer_data = self.get_serializer(self.get_object()).data
+        return Response(status=status.HTTP_200_OK, data=serializer_data)
 
     def patch(self, request, *args, **kwargs):
         data = dict(

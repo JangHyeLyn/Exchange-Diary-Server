@@ -17,7 +17,7 @@ from django.contrib.auth import get_user_model
 class UserViewSet(ModelViewSet):
     queryset = get_user_model().objects.all()
     serializer_class = UserSZ
-    http_method_names = ['get','patch','put','delete']
+    http_method_names = ['get', 'patch', 'put', 'delete']
     tags = ["User"]
 
     def get_permissions(self):
@@ -56,6 +56,7 @@ class UserViewSet(ModelViewSet):
         else:
             return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class UserDetailView(RetrieveUpdateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSZ
@@ -70,6 +71,7 @@ class UserDetailView(RetrieveUpdateAPIView):
         request_user = get_object_or_404(User, pk=kwargs['pk'])
         serializer = self.get_serializer(request_user)
         return Response(data=serializer.data, status=status.HTTP_200_OK)
+
 
 class UserMeView(RetrieveUpdateAPIView):
     queryset = User.objects.all()
