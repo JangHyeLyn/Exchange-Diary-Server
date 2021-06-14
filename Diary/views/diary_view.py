@@ -43,12 +43,7 @@ class DiaryListCreateView(ListCreateAPIView):
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
-            diary = serializer.save()
-            DiaryMember.objects.get_or_create(
-                nickname=request.user.username,
-                diary_id=serializer.data.get('id'),
-                user=request.user
-            )
+            diary = serializer.save(raise_exception=True)
             serializer_data = self.get_serializer(diary).data
             return Response(status=status.HTTP_200_OK, data=serializer_data)
         return Response(status=status.HTTP_400_BAD_REQUEST, data=serializer.errors)
@@ -84,7 +79,7 @@ class DiaryMemberListCreateView(ListCreateAPIView):
 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
+        if serializer.is_valid(raise_exception=True):
             diary_member = serializer.save()
             serializer_data = self.get_serializer(diary_member).data
             return Response(status=status.HTTP_200_OK, data=serializer_data)
@@ -106,16 +101,14 @@ class DiaryMemberMeView(RetrieveUpdateAPIView):
         return Response(status=status.HTTP_200_OK, data=serializer_data)
 
     def patch(self, request, *args, **kwargs):
-        data = dict(
-            nickname=request.POST.get('name'),
-            user=request.user,
-            diary=self.kwargs.get('pk')
-        )
-        serializer = self.get_serializer(data=data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(status=status.HTTP_200_OK, data=serializer.data)
-        return Response(status=status.HTTP_400_BAD_REQUEST, data=serializer.errors)
+        return self.partial_update(request, *args, **kwargs)
+    # def patch(self, request, *args, **kwargs):
+    #
+    #     serializer = self.get_serializer(data=request.data, partial=True)
+    #     if serializer.is_valid(raise_exception=True):
+    #         serializer.save()
+    #         return Response(status=status.HTTP_200_OK, data=serializer.data)
+    #     return Response(status=status.HTTP_400_BAD_REQUEST, data=serializer.errors)
 
 # class DiaryNextWriter(RetrieveAPIView):
 #     queryset = Diary

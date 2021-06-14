@@ -52,3 +52,15 @@ class DiaryMemberMeSZ(ModelSerializer):
         profile_img = self.context.get('request').user.profile_img
         return profile_img.url if profile_img else None
 
+    def validate(self, attrs):
+        profile_img = self.context.get('request').FILES.get('profile_img')
+        try:
+            self.instance.profile_img = profile_img
+        except Exception as e:
+            return attrs
+        attrs['profile_img'] = profile_img
+        return attrs
+
+    def update(self, instance, validated_data):
+        instance
+        return instance

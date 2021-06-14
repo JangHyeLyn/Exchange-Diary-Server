@@ -20,17 +20,29 @@ class DiarySZ(ModelSerializer):
     def validate(self, attr):
         user = self.context.get('request').user
         group = attr.get('group')
+        if not group:
+            return attr
         try:
             DiaryGroup.objects.get(pk=group.id, user=user)
         except DiaryGroup.DoesNotExist as e:
             raise serializers.ValidationError({'group': e})
         return attr
 
+    @transaction.atomic
     def create(self, validated_data):
-        user = self.context.get("request").user
+        request = self.context.get('request')
+        user = request.user
+
         validated_data['user'] = user
         validated_data['now_writer'] = user
         diary = Diary.objects.create(**validated_data)
+
+        # diary_member create
+        DiaryMember.objects.get_or_create(
+            nickname=user.username,
+            diary_id=diary.pk,
+            user=user
+        )
         return diary
 
 
@@ -42,7 +54,7 @@ class DiaryDetailSZ(ModelSerializer):
         fields = ['id', 'title', 'now_page', 'now_writer', 'total_page', 'cover', 'group', 'created_at',
                   'updated_at', ]
 
-        read_only_fields = ("id", "now_page", "total_page", "created_at", "updated_at")
+        read_only_fields = ("id", "now_page", 'now_writer', "total_page", 'group', "created_at", "updated_at")
 
 
 class DiaryMeSZ(ModelSerializer):
