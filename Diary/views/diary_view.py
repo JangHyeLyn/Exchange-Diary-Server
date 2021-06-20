@@ -42,8 +42,8 @@ class DiaryListCreateView(ListCreateAPIView):
 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
-            diary = serializer.save(raise_exception=True)
+        if serializer.is_valid(raise_exception=True):
+            diary = serializer.save()
             serializer_data = self.get_serializer(diary).data
             return Response(status=status.HTTP_200_OK, data=serializer_data)
         return Response(status=status.HTTP_400_BAD_REQUEST, data=serializer.errors)
