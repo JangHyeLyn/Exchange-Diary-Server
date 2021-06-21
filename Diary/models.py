@@ -84,13 +84,3 @@ class DiaryGroup(BaseModel):
         if cls.objects.filter(user=user):
             return cls.objects.filter(user=user).last().rank + 1
         return 1
-
-# class DiaryGroupMember(BaseModel):
-#     group = models.ForeignKey(DiaryGroup, on_delete=models.SET_NULL, null=True, related_name='members', blank=True)
-#     diary = models.ForeignKey(Diary, on_delete=models.SET_NULL, null=True, related_name='groupqwer', blank=True)
-#
-#     class Meta:
-#         ordering = ['pk']
-#
-#     def __str__(self):
-#         return self.diary.title
