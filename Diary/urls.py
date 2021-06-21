@@ -12,13 +12,6 @@ from .views.diary_group_view import DiaryGroupViewSet
 from .views.diary_group_view import DiaryGroupListCreateUpdateView
 from .views.diary_group_view import DiaryGroupDetailView
 
-
-# router = DefaultRouter()
-# router.register('diaries', DiaryViewSet)
-# router.register('diarygroups', ListCreateDiaryGroupView)
-# router.register('groups', DiaryGroupViewSet)
-
-# urlpatterns = router.urls
 urlpatterns = [
     # Diary
     path('diaries/', DiaryListCreateView.as_view(), name='diary'),

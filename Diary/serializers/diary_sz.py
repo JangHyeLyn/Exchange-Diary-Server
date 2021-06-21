@@ -41,7 +41,8 @@ class DiarySZ(ModelSerializer):
         DiaryMember.objects.get_or_create(
             nickname=user.username,
             diary_id=diary.pk,
-            user=user
+            user=user,
+            profile_img=user.profile_img if user.profile_img else None,
         )
         return diary
 
