@@ -35,12 +35,11 @@ class Diary(BaseModel):
 
     # TODO: 다이어리 상태 정의 해야됨 choice fields로 정의서 받으면 그때 진행
     # status = models.
+    class Meta:
+        ordering = ['-id']
 
     def __str__(self):
         return self.title
-
-    class Meta:
-        ordering = ['-id']
 
 
 class DiaryMember(BaseModel):

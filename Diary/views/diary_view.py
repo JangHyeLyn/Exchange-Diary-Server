@@ -11,6 +11,7 @@ from Diary.tasks import add
 from Diary.models import Diary
 from Diary.models import DiaryMember
 from Diary.models import DiaryGroup
+from notification.models import Notification
 from ..exceptions.now_writer_not_withdrawl import NowWriterNotWithdrwal
 from ..permissions import IsSelf
 from rest_framework.response import Response
@@ -104,9 +105,11 @@ class DiaryMemberMeView(RetrieveUpdateDestroyAPIView):
     def patch(self, request, *args, **kwargs):
         return self.partial_update(request, *args, **kwargs)
 
+    @transaction.atomic()
     def delete(self, request, *args, **kwargs):
         diary = get_object_or_404(Diary, id=self.kwargs.get('diary_pk'))
         if diary.now_writer == self.request.user:
             raise NowWriterNotWithdrwal()
+        Notification.send_notification(diary, self.request.user, Notification.TEXT.INVITE)
         self.get_object().delete()  # TODO: 알림 보내야댐
         return Response(status=status.HTTP_200_OK, data='OK')

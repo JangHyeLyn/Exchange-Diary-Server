@@ -12,7 +12,12 @@ class BaseModel(models.Model):
     class Meta:
         abstract = True
 
+
 class Notification(BaseModel):
+    class TEXT(models.TextChoices):
+        INVITE = 'invite', '새로운 일기장에 초대 받았어요!'
+        DROP = 'drop', ' 님이 탈퇴하셨습니다.'
+
     NOTIFICATION_TEXT = (
         '1', '새로운 일기장에 초대 받았어요!',
         '2', ' 님과 교환일기를 작성하러 가볼까요?~?',
@@ -30,11 +35,15 @@ class Notification(BaseModel):
 
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='notifications')
     diary = models.ForeignKey(Diary, on_delete=models.SET_NULL, null=True, related_name='notifications')
-    message = models.CharField(max_length=100)
+    message = models.CharField(max_length=100, choices=TEXT.choices)
 
     class Meta:
         ordering = ['-created_at']
 
-    @property
-    def hi(self):
-        return "hi"
+    @staticmethod
+    def send_notification(diary, user, text):
+        if Notification.TEXT.INVITE == text:
+            pass
+        elif Notification.TEXT.DROP == text:
+            members = diary.members.all().values('user__id') #TODO: annotate 작성
+            pass
