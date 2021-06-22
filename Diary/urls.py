@@ -8,7 +8,6 @@ from .views.diary_view import DiaryMeListView
 from .views.diary_view import DiaryMemberListCreateView
 from .views.diary_view import DiaryMemberMeView
 
-from .views.diary_group_view import DiaryGroupViewSet
 from .views.diary_group_view import DiaryGroupListCreateUpdateView
 from .views.diary_group_view import DiaryGroupDetailView
 
@@ -17,6 +16,7 @@ urlpatterns = [
     path('diaries/', DiaryListCreateView.as_view(), name='diary'),
     path('diaries/<int:pk>/', DiaryDetailView.as_view(), name='diary_detail'),
     path('diaries/me/', DiaryMeListView.as_view(), name='diary_me'),
+
 
     # DiaryGroup
     path('diarygroups/', DiaryGroupListCreateUpdateView.as_view(), name='diarygroup'),
