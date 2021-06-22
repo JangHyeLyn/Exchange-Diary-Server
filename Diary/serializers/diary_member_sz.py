@@ -60,7 +60,3 @@ class DiaryMemberMeSZ(ModelSerializer):
             return attrs
         attrs['profile_img'] = profile_img
         return attrs
-
-    def update(self, instance, validated_data):
-        instance
-        return instance
