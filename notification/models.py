@@ -41,16 +41,15 @@ class Notification(BaseModel):
         ordering = ['-created_at']
 
     @classmethod
-    def send_notification(cls, diary, user, text):
+    def bulk_send_notification(cls, diary, user, text):
         if cls.TEXT.INVITE == text:
             pass
         elif cls.TEXT.DROP == text:
             member_qs = diary.members.all().exclude(user=user)
-
-            # TODO: not create -> use bulk_create
-            # notification_send_list = []
+            message = diary.members.get(user=user).nickname+text.label
+            notification_send_list = []
             for member in member_qs:
-                # notification_drop = cls(user_id=member_id, diary=diary, message=user.username+text.label)
-                # notification_send_list.append(notification_drop)
-                cls.objects.create(user=member.user, diary=diary, message=user.username+text.label)
-            # cls.objects.bulk_create(notification_drop)
+                notification_drop = Notification(user=member.user, diary=diary, message=message)
+                notification_send_list.append(notification_drop)
+            cls.objects.bulk_create(notification_send_list)
+            return None
