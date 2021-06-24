@@ -40,10 +40,17 @@ class Notification(BaseModel):
     class Meta:
         ordering = ['-created_at']
 
-    @staticmethod
-    def send_notification(diary, user, text):
-        if Notification.TEXT.INVITE == text:
+    @classmethod
+    def send_notification(cls, diary, user, text):
+        if cls.TEXT.INVITE == text:
             pass
-        elif Notification.TEXT.DROP == text:
-            members = diary.members.all().values('user__id') #TODO: annotate 작성
-            pass
+        elif cls.TEXT.DROP == text:
+            member_qs = diary.members.all().exclude(user=user)
+
+            # TODO: not create -> use bulk_create
+            # notification_send_list = []
+            for member in member_qs:
+                # notification_drop = cls(user_id=member_id, diary=diary, message=user.username+text.label)
+                # notification_send_list.append(notification_drop)
+                cls.objects.create(user=member.user, diary=diary, message=user.username+text.label)
+            # cls.objects.bulk_create(notification_drop)

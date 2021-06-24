@@ -110,6 +110,6 @@ class DiaryMemberMeView(RetrieveUpdateDestroyAPIView):
         diary = get_object_or_404(Diary, id=self.kwargs.get('diary_pk'))
         if diary.now_writer == self.request.user:
             raise NowWriterNotWithdrwal()
-        Notification.send_notification(diary, self.request.user, Notification.TEXT.INVITE)
-        self.get_object().delete()  # TODO: 알림 보내야댐
+        Notification.send_notification(diary, self.request.user, Notification.TEXT.DROP)
+        self.get_object().delete()
         return Response(status=status.HTTP_200_OK, data='OK')
