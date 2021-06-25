@@ -13,7 +13,7 @@ class NotificationListSZ(ModelSerializer):
 
     class Meta:
         model = Notification
-        fields = ("id", "diary_id", ㅎ"diary_title", "diary_cover", "diary_status", "diary_group", "message", "created_at")
+        fields = ("id", "diary_id", "diary_title", "diary_cover", "diary_status", "diary_group", "message", "created_at")
 
     @staticmethod
     def get_diary_id(obj):
