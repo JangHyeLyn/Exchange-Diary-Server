@@ -2,28 +2,15 @@ from django.db import models, transaction
 
 from django.contrib.auth import get_user_model
 
-
-class BaseModel(models.Model):
-    _created_at = models.DateTimeField(db_column='created_at', auto_now_add=True)
-    _updated_at = models.DateTimeField(db_column='updated_at', auto_now=True)
-
-    @property
-    def created_at(self):
-        return int(self._created_at.timestamp() * 1000)
-
-    @property
-    def updated_at(self):
-        return int(self._updated_at.timestamp() * 1000)
-
-    class Meta:
-        abstract = True
+from core.models.base import BaseModel
 
 
 class Diary(BaseModel):
-    # STATUS_CHOICE = {
-    #     ("0" : ""),
-    #     ("1" : "")
-    # }
+    class Status(models.TextChoices):
+        READY = (0, 'ready')
+        ING = (1, 'ing')
+        FINISH = (2, 'finish')
+
     title = models.CharField(max_length=30)
     now_page = models.IntegerField(default=1)
     total_page = models.IntegerField(default=20)
@@ -32,6 +19,7 @@ class Diary(BaseModel):
     cover = models.IntegerField(default=1)
     promise = models.CharField(max_length=500, null=True, blank=True)
     group = models.ForeignKey('DiaryGroup', default=None, on_delete=models.SET_NULL, null=True, related_name='diaries')
+    status = models.IntegerField(default=0)  # 0 - ready , 1 - ing , 2 - finish
 
     # TODO: 다이어리 상태 정의 해야됨 choice fields로 정의서 받으면 그때 진행
     # status = models.

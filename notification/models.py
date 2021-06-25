@@ -1,16 +1,11 @@
-from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
+from core.models.base import BaseModel
+
 from Diary.models import Diary
 from Accounts.models import User
 
-
-class BaseModel(models.Model):
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        abstract = True
+from core.models.base import BaseModel
 
 
 class Notification(BaseModel):
@@ -38,7 +33,7 @@ class Notification(BaseModel):
     message = models.CharField(max_length=100, choices=TEXT.choices)
 
     class Meta:
-        ordering = ['-created_at']
+        ordering = ['-pk']
 
     @classmethod
     def bulk_send_notification(cls, diary, user, text):
@@ -46,7 +41,7 @@ class Notification(BaseModel):
             pass
         elif cls.TEXT.DROP == text:
             member_qs = diary.members.all().exclude(user=user)
-            message = diary.members.get(user=user).nickname+text.label
+            message = diary.members.get(user=user).nickname + text.label
             notification_send_list = []
             for member in member_qs:
                 notification_drop = Notification(user=member.user, diary=diary, message=message)
