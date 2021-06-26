@@ -5,6 +5,7 @@ from rest_framework.fields import SerializerMethodField
 
 
 class NotificationListSZ(ModelSerializer):
+    diary_id = SerializerMethodField()
     diary_title = SerializerMethodField(default="")
     diary_cover = SerializerMethodField(default="")
     diary_status = SerializerMethodField(default="")
@@ -12,17 +13,24 @@ class NotificationListSZ(ModelSerializer):
 
     class Meta:
         model = Notification
-        fields = ("id", "diary_title", "diary_cover", "diary_status", "diary_group", "message", "created_at", "updated_at")
+        fields = ("id", "diary_id", "diary_title", "diary_cover", "diary_status", "diary_group", "message", "created_at")
 
-    def get_diary_title(self, obj):
+    @staticmethod
+    def get_diary_id(obj):
+        return obj.diary.pk
+
+    @staticmethod
+    def get_diary_title(obj):
         return obj.diary.title
-        return "diary_title"
 
-    def get_diary_cover(self, obj):
+    @staticmethod
+    def get_diary_cover(obj):
         return obj.diary.cover
 
-    def get_diary_status(self, obj):
-        return "diary_status"
+    @staticmethod
+    def get_diary_status(obj):
+        return obj.diary.status
 
-    def get_diary_group(self, obj):
-        return obj.diary.group if obj.diary.group else 0
+    @staticmethod
+    def get_diary_group(obj):
+        return obj.diary.group

@@ -1,18 +1,18 @@
-from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
+from core.models.base import BaseModel
+
 from Diary.models import Diary
 from Accounts.models import User
 
+from core.models.base import BaseModel
 
-class BaseModel(models.Model):
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        abstract = True
 
 class Notification(BaseModel):
+    class TEXT(models.TextChoices):
+        INVITE = 'invite', '새로운 일기장에 초대 받았어요!'
+        DROP = 'drop', ' 님이 탈퇴하셨습니다.'
+
     NOTIFICATION_TEXT = (
         '1', '새로운 일기장에 초대 받았어요!',
         '2', ' 님과 교환일기를 작성하러 가볼까요?~?',
@@ -30,11 +30,21 @@ class Notification(BaseModel):
 
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='notifications')
     diary = models.ForeignKey(Diary, on_delete=models.SET_NULL, null=True, related_name='notifications')
-    message = models.CharField(max_length=100)
+    message = models.CharField(max_length=100, choices=TEXT.choices)
 
     class Meta:
-        ordering = ['-created_at']
+        ordering = ['-pk']
 
-    @property
-    def hi(self):
-        return "hi"
+    @classmethod
+    def bulk_send_notification(cls, diary, user, text):
+        if cls.TEXT.INVITE == text:
+            pass
+        elif cls.TEXT.DROP == text:
+            member_qs = diary.members.all().exclude(user=user)
+            message = diary.members.get(user=user).nickname + text.label
+            notification_send_list = []
+            for member in member_qs:
+                notification_drop = Notification(user=member.user, diary=diary, message=message)
+                notification_send_list.append(notification_drop)
+            cls.objects.bulk_create(notification_send_list)
+            return None

@@ -47,3 +47,4 @@ def kakao_callback(request):
 class KakaoLogin(SocialLoginView):
     adapter_class = KakaoOAuth2Adapter
 
+

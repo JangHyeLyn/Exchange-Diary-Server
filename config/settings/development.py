@@ -2,7 +2,7 @@ from .base import *
 
 ALLOWED_HOSTS = ['*']
 
-DATABASES = SECRET['DATABASE']
+DATABASES = SECRET['DATABASE_DEV']
 
 # aws s3
 AWS_ACCESS_KEY_ID = SECRET['AWS_ACCESS_KEY_ID'] # .csv 파일에 있는 내용을 입력 Access key ID
@@ -17,7 +17,8 @@ AWS_S3_OBJECT_PARAMETERS = {
 }
 
 INSTALLED_APPS +=[
-    'debug_toolbar'
+    'debug_toolbar',
+    'django_seed',
 ]
 
 MIDDLEWARE += [

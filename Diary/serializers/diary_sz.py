@@ -1,9 +1,10 @@
 from django.db import transaction
-from rest_framework.serializers import ModelSerializer, HyperlinkedModelSerializer
-from django.shortcuts import get_object_or_404
-from Accounts.serializers.user_diary_sz import UserDiarySZ
-from .diary_member_sz import DiaryMemberSZ
+from django.core.exceptions import ValidationError
+
 from rest_framework import serializers
+from rest_framework.serializers import ModelSerializer
+from rest_framework.serializers import SerializerMethodField
+
 from ..models import Diary
 from ..models import DiaryMember
 from ..models import DiaryGroup
@@ -16,22 +17,45 @@ class DiarySZ(ModelSerializer):
                   'updated_at']
         read_only_fields = ("id", "now_page", "user", "now_writer", "created_at", "updated_at")
 
-    @transaction.atomic()
+    def validate(self, attr):
+        user = self.context.get('request').user
+        group = attr.get('group')
+        if not group:
+            return attr
+        try:
+            DiaryGroup.objects.get(pk=group.id, user=user)
+        except DiaryGroup.DoesNotExist as e:
+            raise serializers.ValidationError({'group': e})
+        return attr
+
+    @transaction.atomic
     def create(self, validated_data):
-        request = self.context.get("request")
-        diary = Diary.objects.create(**validated_data, user=request.user, now_writer=request.user)
+        request = self.context.get('request')
+        user = request.user
+
+        validated_data['user'] = user
+        validated_data['now_writer'] = user
+        diary = Diary.objects.create(**validated_data)
+
+        # diary_member create
+        DiaryMember.objects.get_or_create(
+            nickname=user.username,
+            diary_id=diary.pk,
+            user=user,
+            profile_img=user.profile_img if user.profile_img else None,
+        )
         return diary
 
 
 class DiaryDetailSZ(ModelSerializer):
     # members = DiaryMemberSZ(many=True, read_only=True)
-    # group = serializers.SerializerMethodField()
+
     class Meta:
         model = Diary
         fields = ['id', 'title', 'now_page', 'now_writer', 'total_page', 'cover', 'group', 'created_at',
                   'updated_at', ]
 
-        read_only_fields = ("id", "now_page", "total_page", "created_at", "updated_at")
+        read_only_fields = ("id", "now_page", 'now_writer', "total_page", 'group', "created_at", "updated_at")
 
 
 class DiaryMeSZ(ModelSerializer):
@@ -40,10 +64,11 @@ class DiaryMeSZ(ModelSerializer):
         fields = ['id', 'title', 'now_page', 'total_page', 'user', 'now_writer', 'cover', 'group', 'created_at',
                   'updated_at']
         read_only_fields = (
-        'id', 'title', 'now_page', 'total_page', 'user', 'now_writer', 'cover', 'group', 'created_at', 'updated_at')
+            'id', 'title', 'now_page', 'total_page', 'user', 'now_writer', 'cover', 'group', 'created_at', 'updated_at')
+
 
 class DiaryInGroupSZ(ModelSerializer):
     class Meta:
         model = Diary
-        fields = ['id', 'title',]
-        read_only_fields = ('id', 'title', )
+        fields = ['id', 'title', ]
+        read_only_fields = ('id', 'title',)
