@@ -1,19 +1,25 @@
 from django.db import transaction
-from django.views import View
 from django.shortcuts import get_object_or_404
-from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
-from rest_framework.viewsets import ModelViewSet
-from rest_framework.decorators import action
-from rest_framework import status, viewsets, mixins
 
-from config.pagination import LargeResultsSetPagination
-from Diary.tasks import add
+from rest_framework import status
+from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
+from rest_framework.response import Response
+
+
+from rest_framework.generics import ListCreateAPIView
+from rest_framework.generics import RetrieveUpdateAPIView
+from rest_framework.generics import RetrieveUpdateDestroyAPIView
+from rest_framework.generics import RetrieveAPIView
+from rest_framework.generics import CreateAPIView
+from rest_framework.generics import ListAPIView
+
+# Diary
 from Diary.models import Diary
 from Diary.models import DiaryMember
 from Diary.models import DiaryGroup
-from ..exceptions.now_writer_not_withdrawl import NowWriterNotWithdrwal
-from ..permissions import IsSelf
-from rest_framework.response import Response
+
+from notification.models import Notification
+from Diary.exceptions.now_writer_not_withdrawl import NowWriterNotWithdrwal
 
 from Diary.serializers.diary_sz import DiarySZ
 from Diary.serializers.diary_sz import DiaryDetailSZ
@@ -22,14 +28,8 @@ from Diary.serializers.diary_sz import DiaryMeSZ
 from Diary.serializers.diary_member_sz import DiaryMemberSZ
 from Diary.serializers.diary_member_sz import DiaryMemberMeSZ
 
-from rest_framework import status
-
-from rest_framework.generics import ListCreateAPIView
-from rest_framework.generics import RetrieveUpdateAPIView
-from rest_framework.generics import RetrieveUpdateDestroyAPIView
-from rest_framework.generics import RetrieveAPIView
-from rest_framework.generics import CreateAPIView
-from rest_framework.generics import ListAPIView
+# permission
+from Diary.permissions.diary_member_permission import DiaryMemberPermission
 
 from ..tasks import add
 
@@ -78,6 +78,10 @@ class DiaryMemberListCreateView(ListCreateAPIView):
     def get_queryset(self):
         return DiaryMember.objects.filter(diary_id=self.kwargs.get('diary_pk'))
 
+    def get(self, request, *args, **kwargs):
+        serializer_data = self.get_serializer(self.get_queryset(), many=True).data
+        return Response(status=status.HTTP_200_OK, data=serializer_data)
+
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
@@ -90,6 +94,7 @@ class DiaryMemberListCreateView(ListCreateAPIView):
 class DiaryMemberMeView(RetrieveUpdateDestroyAPIView):
     queryset = DiaryMember
     serializer_class = DiaryMemberMeSZ
+    permission_classes = [DiaryMemberPermission]
 
     def get_queryset(self):
         return DiaryMember.objects.filter(diary_id=self.kwargs.get('diary_pk'), user=self.request.user)
@@ -104,9 +109,11 @@ class DiaryMemberMeView(RetrieveUpdateDestroyAPIView):
     def patch(self, request, *args, **kwargs):
         return self.partial_update(request, *args, **kwargs)
 
+    @transaction.atomic()
     def delete(self, request, *args, **kwargs):
         diary = get_object_or_404(Diary, id=self.kwargs.get('diary_pk'))
         if diary.now_writer == self.request.user:
             raise NowWriterNotWithdrwal()
-        self.get_object().delete()  # TODO: 알림 보내야댐
+        Notification.bulk_send_notification(diary, self.request.user, Notification.TEXT.DROP)
+        self.get_object().delete()
         return Response(status=status.HTTP_200_OK, data='OK')
