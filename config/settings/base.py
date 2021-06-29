@@ -1,6 +1,3 @@
-import datetime
-import sys
-
 from config.settings.secret import SECRET
 import os
 # import djcelery
@@ -58,6 +55,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'config.middlewares.jwt_invalid.JWTTokenInvalidMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
