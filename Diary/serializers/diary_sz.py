@@ -1,4 +1,5 @@
 from django.db import transaction
+from django.db.models import F
 from django.core.exceptions import ValidationError
 
 from rest_framework import serializers
@@ -48,14 +49,14 @@ class DiarySZ(ModelSerializer):
 
 
 class DiaryDetailSZ(ModelSerializer):
-    # members = DiaryMemberSZ(many=True, read_only=True)
-
     class Meta:
         model = Diary
-        fields = ['id', 'title', 'now_page', 'now_writer', 'total_page', 'cover', 'group', 'created_at',
+        fields = ['id', 'title', 'now_page', 'now_writer', 'total_page', 'cover', 'group',
+                  'created_at',
                   'updated_at', ]
 
-        read_only_fields = ("id", "now_page", 'now_writer', "total_page", 'group', "created_at", "updated_at")
+        read_only_fields = (
+            "id", "now_page", 'now_writer_name', "total_page", 'group', "created_at", "updated_at")
 
 
 class DiaryMeSZ(ModelSerializer):

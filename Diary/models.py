@@ -14,7 +14,8 @@ class Diary(BaseModel):
     title = models.CharField(max_length=30)
     now_page = models.IntegerField(default=1)
     total_page = models.IntegerField(default=20)
-    now_writer = models.ForeignKey(get_user_model(), on_delete=models.SET_NULL, null=True, related_name='now_writers')
+    _now_writer = models.ForeignKey(get_user_model(), db_column='now_writer_id', on_delete=models.SET_NULL, null=True,
+                                    related_name='now_writers')
     user = models.ForeignKey(get_user_model(), on_delete=models.SET_NULL, null=True, related_name='diaries')
     cover = models.IntegerField(default=1)
     promise = models.CharField(max_length=500, null=True, blank=True)
@@ -27,7 +28,20 @@ class Diary(BaseModel):
         ordering = ['-id']
 
     def __str__(self):
-        return self.title
+        return f'{self.pk}-{self.title}'
+
+    @property
+    def now_writer(self):
+        try:
+            now_writer_list = list(self.members.filter(user=self._now_writer).values_list('nickname', flat=True))
+            now_writer = now_writer_list.pop()
+            return now_writer
+        except Exception as e:
+            return None
+
+    @now_writer.setter
+    def now_writer(self, value):
+        self._now_writer = value
 
 
 class DiaryMember(BaseModel):
