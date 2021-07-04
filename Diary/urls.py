@@ -1,22 +1,21 @@
 from django.urls import path
-from rest_framework.routers import DefaultRouter
 
-# from .views.diaryview import DiaryViewSet
-from .views.diary_view import DiaryListCreateView
-from .views.diary_view import DiaryDetailView
-from .views.diary_view import DiaryMeListView
-from .views.diary_view import DiaryMemberListCreateView
-from .views.diary_view import DiaryMemberMeView
+from Diary.views.diary_view import DiaryListCreateView
+from Diary.views.diary_view import DiaryDetailView
+from Diary.views.diary_view import DiaryMeListView
+from Diary.views.diary_view import DiaryMemberListCreateView
+from Diary.views.diary_view import DiaryMemberMeView
+from Diary.views.diary_now_writer_view import DiaryNowWriterView
 
-from .views.diary_group_view import DiaryGroupListCreateUpdateView
-from .views.diary_group_view import DiaryGroupDetailView
+from Diary.views.diary_group_view import DiaryGroupListCreateUpdateView
+from Diary.views.diary_group_view import DiaryGroupDetailView
 
 urlpatterns = [
     # Diary
     path('diaries/', DiaryListCreateView.as_view(), name='diary'),
     path('diaries/<int:pk>/', DiaryDetailView.as_view(), name='diary_detail'),
     path('diaries/me/', DiaryMeListView.as_view(), name='diary_me'),
-
+    path('diaries/me/writer/', DiaryNowWriterView.as_view(), name='diary_writer_now_list'),
 
     # DiaryGroup
     path('diarygroups/', DiaryGroupListCreateUpdateView.as_view(), name='diarygroup'),
