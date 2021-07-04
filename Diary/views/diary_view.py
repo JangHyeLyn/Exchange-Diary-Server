@@ -5,7 +5,6 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
 from rest_framework.response import Response
 
-
 from rest_framework.generics import ListCreateAPIView
 from rest_framework.generics import RetrieveUpdateAPIView
 from rest_framework.generics import RetrieveUpdateDestroyAPIView
@@ -57,10 +56,13 @@ class DiaryDetailView(RetrieveUpdateDestroyAPIView):
         IsAuthenticated,
     )
 
+    def get_object(self):
+        obj = get_object_or_404(Diary, pk=self.kwargs.get('pk'))
+        # TODO: 다이어리 수정을 할 수 있는 권한 및 제한을 두어야 할 듯
+        return obj
+
     def patch(self, request, *args, **kwargs):
-        kwargs['partial'] = True
-        add.delay()
-        return self.update(request, *args, **kwargs)
+        return self.partial_update(request, *args, **kwargs)
 
 
 class DiaryMeListView(ListAPIView):
