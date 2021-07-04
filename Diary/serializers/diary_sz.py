@@ -1,5 +1,5 @@
 from django.db import transaction
-from django.db.models import F
+from django.shortcuts import get_object_or_404
 from django.core.exceptions import ValidationError
 
 from rest_framework import serializers
@@ -57,6 +57,20 @@ class DiaryDetailSZ(ModelSerializer):
 
         read_only_fields = (
             "id", "now_page", 'now_writer_name', "total_page", 'group', "created_at", "updated_at")
+
+    def validate(self, attrs):
+        request = self.context.get('request')
+        user = request.user
+        group_id = int(request.data.get('group'))
+
+        if group_id == 0 or group_id:
+            if group_id is 0:
+                group = None
+            else:
+                group = get_object_or_404(DiaryGroup, pk=group_id, user=user)
+            attrs['group'] = group
+
+        return attrs
 
 
 class DiaryMeSZ(ModelSerializer):
