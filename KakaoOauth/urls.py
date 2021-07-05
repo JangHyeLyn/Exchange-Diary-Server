@@ -8,5 +8,5 @@ urlpatterns = [
     path('account/login/kakao/callback/', kakao_callback, name='kakao_callback'),
 
     # All-Auth
-    path('rest-auth/kakao/', KakaoLogin.as_view(), name='kakao_login'),
+    path('rest-auth/kakao/', KakaoLogin.as_view(), name='kakao_jwt'),
     ]
