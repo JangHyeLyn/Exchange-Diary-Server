@@ -43,6 +43,10 @@ class Diary(BaseModel):
     def now_writer(self, value):
         self._now_writer = value
 
+    @property
+    def members_count(self):
+        return self.members.count()
+
 
 class DiaryMember(BaseModel):
     nickname = models.CharField(max_length=20, blank=True)
