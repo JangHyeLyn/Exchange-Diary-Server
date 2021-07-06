@@ -76,10 +76,11 @@ class DiaryDetailSZ(ModelSerializer):
 class DiaryMeSZ(ModelSerializer):
     class Meta:
         model = Diary
-        fields = ['id', 'title', 'now_page', 'total_page', 'user', 'now_writer', 'cover', 'group', 'created_at',
-                  'updated_at']
+        fields = ['id', 'title', 'now_page', 'total_page', 'now_writer', 'members_count', 'cover', 'group',
+                  'created_at', 'updated_at']
         read_only_fields = (
-            'id', 'title', 'now_page', 'total_page', 'user', 'now_writer', 'cover', 'group', 'created_at', 'updated_at')
+            'id', 'title', 'now_page', 'total_page', 'now_writer', 'members_count', 'cover', 'group', 'created_at',
+            'updated_at')
 
 
 class DiaryInGroupSZ(ModelSerializer):
